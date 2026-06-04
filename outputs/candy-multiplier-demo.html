@@ -3594,8 +3594,9 @@
       const gain = audio.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
-      const attack = Math.min(0.03, duration * 0.32);
-      const releaseStart = Math.max(startTime + attack + 0.01, startTime + duration - 0.045);
+      const attack = Math.min(0.055, duration * 0.38);
+      const release = Math.min(0.11, duration * 0.55);
+      const releaseStart = Math.max(startTime + attack + 0.012, startTime + duration - release);
       gain.gain.setValueAtTime(0, startTime);
       gain.gain.linearRampToValueAtTime(volume, startTime + attack);
       gain.gain.setValueAtTime(volume, releaseStart);
@@ -3603,7 +3604,7 @@
       osc.connect(gain);
       gain.connect(audio.destination);
       osc.start(startTime);
-      osc.stop(startTime + duration + 0.025);
+      osc.stop(startTime + duration + 0.08);
     }
 
     function chord(freqs, duration, volume, type, startTime) {
@@ -3662,13 +3663,11 @@
         for (let i = 0; i < 8; i += 1) {
           const t = now + i * 0.18;
           const arpNote = arp[(bar * 4 + i) % arp.length];
-          if (i % 2 === 0) tone(arpNote, 0.105, 0.016, "triangle", t);
-          if (i === 1 || i === 5) sugarTick(t + 0.05, 0.013);
+          if (i % 2 === 0) tone(arpNote, 0.22, 0.009, "sine", t);
 
           const leadNote = lead[(bar * 8 + i) % lead.length];
           if (leadNote && (i === 2 || i === 3 || i === 6)) {
-            tone(leadNote, 0.22, 0.032, "sine", t + 0.025);
-            tone(leadNote * 2, 0.07, 0.008, "triangle", t + 0.045);
+            tone(leadNote, 0.34, 0.02, "sine", t + 0.025);
           }
         }
         bar += 1;
@@ -3696,10 +3695,9 @@
         for (let i = 0; i < 8; i += 1) {
           const t = now + i * 0.16;
           const note = sparkle[(step * 3 + i) % sparkle.length];
-          if (i % 2 === 0) tone(note, 0.11, 0.024, "triangle", t);
+          if (i % 2 === 0) tone(note, 0.24, 0.013, "sine", t);
           if (i === 3 || i === 7) {
-            tone(note * 1.5, 0.08, 0.012, "sine", t + 0.045);
-            sugarTick(t + 0.03, 0.018);
+            tone(note * 0.75, 0.3, 0.01, "sine", t + 0.045);
           }
         }
         step += 1;
