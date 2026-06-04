@@ -2804,6 +2804,7 @@
 
     function collectClearStats(clearList, groups, chain) {
       const colors = Array.from({ length: candyTypes }, () => 0);
+      const countedSpecials = new Set();
       let scoringCount = 0;
       let striped = 0;
       let wrapped = 0;
@@ -2815,15 +2816,38 @@
         if (!cell || cell.special === "free") continue;
         scoringCount += 1;
         colors[cell.type] += 1;
-        if (cell.special === "striped-h" || cell.special === "striped-v") striped += 1;
-        if (cell.special === "wrapped") wrapped += 1;
-        if (cell.special === "color") colorSpecial += 1;
+        const specialKey = keyOf(pos);
+        if (cell.special === "striped-h" || cell.special === "striped-v") {
+          striped += 1;
+          countedSpecials.add(specialKey);
+        }
+        if (cell.special === "wrapped") {
+          wrapped += 1;
+          countedSpecials.add(specialKey);
+        }
+        if (cell.special === "color") {
+          colorSpecial += 1;
+          countedSpecials.add(specialKey);
+        }
       }
       for (const group of groups) {
         if (group.comboSpecial && group.comboSpecial.startsWith("color-")) colorCombo += 1;
         if (group.comboSpecial && group.comboSpecial !== "color-normal") specialCombo += 1;
-        if (group.comboSpecial && group.comboSpecial.includes("striped")) striped += 1;
-        if (group.comboSpecial && group.comboSpecial.includes("wrapped")) wrapped += 1;
+        for (const pos of group.cells || []) {
+          const cell = state.board[pos.r][pos.c];
+          const specialKey = keyOf(pos);
+          if (!cell || cell.special === "free" || countedSpecials.has(specialKey)) continue;
+          if (cell.special === "striped-h" || cell.special === "striped-v") {
+            striped += 1;
+            countedSpecials.add(specialKey);
+          } else if (cell.special === "wrapped") {
+            wrapped += 1;
+            countedSpecials.add(specialKey);
+          } else if (cell.special === "color") {
+            colorSpecial += 1;
+            countedSpecials.add(specialKey);
+          }
+        }
       }
       return { colors, scoringCount, striped, wrapped, colorSpecial, colorCombo, specialCombo, comboWaves: Math.max(0, chain - 1) };
     }
