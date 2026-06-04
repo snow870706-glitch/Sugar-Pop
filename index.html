@@ -3570,9 +3570,12 @@
       const gain = audio.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
-      gain.gain.setValueAtTime(0.0001, startTime);
-      gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      const attack = Math.min(0.03, duration * 0.32);
+      const releaseStart = Math.max(startTime + attack + 0.01, startTime + duration - 0.045);
+      gain.gain.setValueAtTime(0, startTime);
+      gain.gain.linearRampToValueAtTime(volume, startTime + attack);
+      gain.gain.setValueAtTime(volume, releaseStart);
+      gain.gain.linearRampToValueAtTime(0, startTime + duration);
       osc.connect(gain);
       gain.connect(audio.destination);
       osc.start(startTime);
@@ -3589,29 +3592,7 @@
     }
 
     function sugarTick(startTime, volume = 0.018) {
-      const audio = state.audio;
-      if (!audio) return;
-
-      const noise = audio.createBufferSource();
-      const buffer = audio.createBuffer(1, Math.floor(audio.sampleRate * 0.055), audio.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < data.length; i += 1) {
-        data[i] = (Math.random() * 2 - 1) * (1 - i / data.length);
-      }
-
-      const filter = audio.createBiquadFilter();
-      const gain = audio.createGain();
-      filter.type = "highpass";
-      filter.frequency.setValueAtTime(5200, startTime);
-      gain.gain.setValueAtTime(0.0001, startTime);
-      gain.gain.exponentialRampToValueAtTime(volume, startTime + 0.006);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.052);
-      noise.buffer = buffer;
-      noise.connect(filter);
-      filter.connect(gain);
-      gain.connect(audio.destination);
-      noise.start(startTime);
-      noise.stop(startTime + 0.06);
+      return;
     }
 
     function softPad(freqs, startTime, duration = 1.35) {
