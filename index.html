@@ -8,7 +8,7 @@
     :root {
       --ink: #5a2d61;
       --panel: rgba(255, 255, 255, 0.78);
-      --cell: clamp(38px, 12.2vw, 66px);
+      --cell: clamp(32px, 10.6vw, 58px);
       font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     }
 
@@ -130,11 +130,11 @@
     .board {
       position: relative;
       width: calc(var(--cell) * 7 + 18px);
-      height: calc(var(--cell) * 7 + 18px);
+      height: calc(var(--cell) * 9 + 18px);
       padding: 9px;
       display: grid;
       grid-template-columns: repeat(7, var(--cell));
-      grid-template-rows: repeat(7, var(--cell));
+      grid-template-rows: repeat(9, var(--cell));
       border-radius: 12px;
       background:
         linear-gradient(145deg, rgba(255,255,255,0.82), rgba(255,255,255,0.34)),
@@ -165,6 +165,8 @@
     .cell.settling .candy { animation: candy-settle 280ms cubic-bezier(.2, .95, .24, 1.05); }
     .cell.hint { background: rgba(255,255,255,0.48); }
     .cell.hint .candy { animation: hint-hop 760ms ease-in-out infinite; }
+    .board.reshuffling .candy { animation: candy-vacuum 620ms cubic-bezier(.62, .02, .86, .38) forwards; }
+    .board.spawning .candy { animation: candy-spit 560ms cubic-bezier(.16, .92, .24, 1.12) both; }
 
     .candy {
       position: relative;
@@ -199,32 +201,32 @@
 
     .type-0 {
       border-radius: 50% 46% 52% 48%;
-      background: radial-gradient(circle at 32% 24%, #ff94b4 0 12%, #ff3f79 34%, #c90f4d 100%);
+      background: radial-gradient(circle at 32% 24%, #ff8aab 0 12%, #f01864 34%, #a9003c 100%);
     }
 
     .type-1 {
       border-radius: 42% 58% 45% 55%;
-      background: radial-gradient(circle at 34% 24%, #ffe282 0 13%, #ffb82e 38%, #e06b00 100%);
+      background: radial-gradient(circle at 34% 24%, #ffd179 0 13%, #ff8c1a 38%, #b84a00 100%);
     }
 
     .type-2 {
       border-radius: 52% 48% 42% 58%;
-      background: radial-gradient(circle at 32% 24%, #98f7ff 0 12%, #1cc5f3 38%, #0876bd 100%);
+      background: radial-gradient(circle at 32% 24%, #8cf4ff 0 12%, #00a8ff 38%, #005fba 100%);
     }
 
     .type-3 {
       border-radius: 46% 54% 56% 44%;
-      background: radial-gradient(circle at 34% 24%, #c1ff93 0 12%, #52d947 38%, #159844 100%);
+      background: radial-gradient(circle at 34% 24%, #b7ff70 0 12%, #24c73b 38%, #087b2c 100%);
     }
 
     .type-4 {
       border-radius: 55% 45% 52% 48%;
-      background: radial-gradient(circle at 32% 24%, #d9b2ff 0 13%, #9a5cff 38%, #5a20c9 100%);
+      background: radial-gradient(circle at 32% 24%, #d1a0ff 0 13%, #8b35ff 38%, #4410b8 100%);
     }
 
     .type-5 {
       border-radius: 48% 52% 58% 42%;
-      background: radial-gradient(circle at 34% 24%, #fff178 0 12%, #ffd22e 37%, #d69700 100%);
+      background: radial-gradient(circle at 34% 24%, #fff35c 0 12%, #ffd400 37%, #b58600 100%);
     }
 
     .controls {
@@ -307,6 +309,18 @@
       100% { transform: translateY(0) scale(1); }
     }
 
+    @keyframes candy-vacuum {
+      0% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); filter: brightness(1.05) drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22)); }
+      55% { opacity: 1; transform: translate(calc(var(--pull-x) * var(--cell) * 0.62), calc(var(--pull-y) * var(--cell) * 0.62)) scale(0.72) rotate(160deg); filter: brightness(1.25) drop-shadow(0 0 20px rgba(255,255,255,0.8)); }
+      100% { opacity: 0; transform: translate(calc(var(--pull-x) * var(--cell)), calc(var(--pull-y) * var(--cell))) scale(0.05) rotate(420deg); }
+    }
+
+    @keyframes candy-spit {
+      0% { opacity: 0; transform: translate(calc(var(--pull-x) * var(--cell)), calc(var(--pull-y) * var(--cell))) scale(0.08) rotate(-240deg); filter: brightness(1.5) drop-shadow(0 0 18px rgba(255,255,255,0.9)); }
+      72% { opacity: 1; transform: translate(-3px, 2px) scale(1.08) rotate(8deg); }
+      100% { opacity: 1; transform: translate(0, 0) scale(1) rotate(0deg); }
+    }
+
     @keyframes hint-hop {
       0%, 100% { transform: translateY(0) scale(1); }
       42% { transform: translateY(-7px) scale(1.04); }
@@ -319,7 +333,7 @@
     }
 
     @media (max-height: 760px) {
-      :root { --cell: clamp(34px, 11.5vw, 56px); }
+      :root { --cell: clamp(31px, 10.1vw, 50px); }
       .app { gap: 6px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
       .brand-title { font-size: clamp(22px, 7vw, 34px); }
       .brand-sub { display: none; }
@@ -328,7 +342,7 @@
     }
 
     @media (max-width: 390px) {
-      :root { --cell: clamp(34px, 11.5vw, 54px); }
+      :root { --cell: clamp(30px, 10vw, 48px); }
       .toast { font-size: 12px; }
       .hint-btn { padding: 0 12px; }
     }
@@ -364,7 +378,8 @@
   </main>
 
   <script>
-    const size = 7;
+    const cols = 7;
+    const rows = 9;
     const candyTypes = 6;
     const minGroup = 3;
     const comboWindow = 2000;
@@ -380,6 +395,8 @@
       entering: new Set(),
       settling: new Set(),
       invalid: new Set(),
+      reshuffling: false,
+      spawning: false,
       popups: [],
       hintTimer: null,
       audio: null,
@@ -404,7 +421,7 @@
     }
 
     function inBounds(r, c) {
-      return r >= 0 && r < size && c >= 0 && c < size;
+      return r >= 0 && r < rows && c >= 0 && c < cols;
     }
 
     function randomCandy() {
@@ -434,14 +451,18 @@
 
     function render() {
       els.board.innerHTML = "";
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
+      els.board.classList.toggle("reshuffling", state.reshuffling);
+      els.board.classList.toggle("spawning", state.spawning);
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
           const cell = state.board[r][c];
           const button = document.createElement("button");
           button.type = "button";
           button.className = "cell";
           button.dataset.r = r;
           button.dataset.c = c;
+          button.style.setProperty("--pull-x", ((cols - 1) / 2) - c);
+          button.style.setProperty("--pull-y", ((rows - 1) / 2) - r);
           button.setAttribute("aria-label", `candy ${r + 1}-${c + 1}`);
           const key = keyOf({ r, c });
           if (state.clearing.has(key)) button.classList.add("clearing");
@@ -469,11 +490,22 @@
     }
 
     function createBoard() {
+      state.board = randomPlayableBoard();
+    }
+
+    function randomBoard() {
+      return Array.from({ length: rows }, () =>
+        Array.from({ length: cols }, () => makeCell())
+      );
+    }
+
+    function randomPlayableBoard() {
+      let board;
       do {
-        state.board = Array.from({ length: size }, () =>
-          Array.from({ length: size }, () => makeCell())
-        );
+        board = randomBoard();
+        state.board = board;
       } while (!findClickableGroups().length);
+      return board;
     }
 
     function getConnectedGroup(start) {
@@ -506,8 +538,8 @@
     function findClickableGroups() {
       const groups = [];
       const visited = new Set();
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
           const key = keyOf({ r, c });
           if (visited.has(key) || !state.board[r][c]) continue;
           const group = getConnectedGroup({ r, c });
@@ -565,13 +597,13 @@
 
     function collapseBoard() {
       const moved = [];
-      for (let c = 0; c < size; c += 1) {
+      for (let c = 0; c < cols; c += 1) {
         const stack = [];
-        for (let r = size - 1; r >= 0; r -= 1) {
+        for (let r = rows - 1; r >= 0; r -= 1) {
           if (state.board[r][c]) stack.push(state.board[r][c]);
         }
-        for (let r = size - 1; r >= 0; r -= 1) {
-          const next = stack[size - 1 - r] || null;
+        for (let r = rows - 1; r >= 0; r -= 1) {
+          const next = stack[rows - 1 - r] || null;
           if (state.board[r][c] !== next && next) moved.push({ r, c });
           state.board[r][c] = next;
         }
@@ -580,56 +612,54 @@
     }
 
     function refillBoard() {
-      let filled = [];
-      const snapshot = state.board.map(row => row.slice());
-      for (let attempt = 0; attempt < 80; attempt += 1) {
-        state.board = snapshot.map(row => row.slice());
-        filled = [];
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) {
-            if (!state.board[r][c]) {
-              state.board[r][c] = makeCell();
-              filled.push({ r, c });
-            }
+      const filled = [];
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
+          if (!state.board[r][c]) {
+            state.board[r][c] = makeCell();
+            filled.push({ r, c });
           }
         }
-        if (findClickableGroups().length) return filled;
       }
-
-      if (forcePlayableWithNewCells(filled)) return filled;
       return filled;
     }
 
-    function forcePlayableWithNewCells(filled) {
-      const filledKeys = new Set(filled.map(keyOf));
-      for (const pos of filled) {
-        const original = state.board[pos.r][pos.c];
-        for (let type = 0; type < candyTypes; type += 1) {
-          state.board[pos.r][pos.c] = makeCell(type);
-          if (findClickableGroups().length) return true;
-        }
-        state.board[pos.r][pos.c] = original;
-      }
+    async function reshuffleDeadBoard() {
+      if (findClickableGroups().length) return false;
+      state.busy = true;
+      state.hint = [];
+      clearIdleHint();
+      setToast("\u6c92\u6709\u53ef\u6d88\u7cd6\u679c\uff0c\u5168\u90e8\u5438\u9032\u7cd6\u679c\u6a5f...");
+      playSound("shuffle");
+      state.reshuffling = true;
+      render();
+      await wait(700);
 
-      for (const pos of filled) {
-        const shapes = [
-          [pos, { r: pos.r, c: pos.c + 1 }, { r: pos.r, c: pos.c + 2 }],
-          [pos, { r: pos.r + 1, c: pos.c }, { r: pos.r + 2, c: pos.c }]
-        ];
-        for (const shape of shapes) {
-          if (!shape.every(p => inBounds(p.r, p.c) && filledKeys.has(keyOf(p)))) continue;
-          const type = randomCandy();
-          for (const p of shape) state.board[p.r][p.c] = makeCell(type);
-          return true;
-        }
-      }
-      return false;
+      state.board = randomPlayableBoard();
+      state.reshuffling = false;
+      state.spawning = true;
+      state.entering = new Set(
+        Array.from({ length: rows }, (_, r) =>
+          Array.from({ length: cols }, (_, c) => keyOf({ r, c }))
+        ).flat()
+      );
+      setToast("\u65b0\u7cd6\u679c\u5410\u51fa\u4f86\u4e86\uff01");
+      render();
+      await wait(620);
+
+      state.spawning = false;
+      state.entering.clear();
+      state.busy = false;
+      updateUI();
+      render();
+      resetIdleHint();
+      return true;
     }
 
     function showScorePopup(anchor, gain, combo) {
       state.popups.push({
         r: Math.max(0, anchor.r - 0.2),
-        c: Math.min(size - 1, anchor.c + 0.15),
+        c: Math.min(cols - 1, anchor.c + 0.15),
         text: combo > 0 ? `+${gain}  x${comboMultiplier().toFixed(1)}` : `+${gain}`,
         combo: combo > 0
       });
@@ -668,6 +698,10 @@
       state.settling.clear();
       state.entering.clear();
       state.hint = [];
+      if (!findClickableGroups().length) {
+        await reshuffleDeadBoard();
+        return;
+      }
       state.busy = false;
       updateUI();
       render();
@@ -686,6 +720,10 @@
         playSound("invalid");
         await wait(280);
         state.invalid.clear();
+        if (!findClickableGroups().length) {
+          await reshuffleDeadBoard();
+          return;
+        }
         render();
         resetIdleHint();
         return;
@@ -749,6 +787,10 @@
         tone(620, 0.16, 0.055, "sine", now);
         tone(820, 0.19, 0.052, "sine", now + 0.06);
         tone(1040, 0.24, 0.042, "sine", now + 0.14);
+      } else if (kind === "shuffle") {
+        tone(330, 0.32, 0.045, "sine", now);
+        tone(247, 0.42, 0.04, "sine", now + 0.12);
+        tone(523, 0.38, 0.035, "sine", now + 0.34);
       }
     }
 
@@ -762,24 +804,29 @@
     function startMusic() {
       if (state.musicTimer || !state.audio) return;
       const chords = [
-        [262, 330, 392, 523],
-        [220, 277, 330, 440],
-        [294, 370, 440, 587],
-        [196, 247, 294, 392]
+        [349, 440, 523, 698],
+        [392, 494, 587, 784],
+        [330, 415, 494, 659],
+        [523, 659, 784, 1047]
       ];
-      const bass = [131, 110, 147, 98];
+      const bass = [175, 196, 165, 262];
+      const melody = [698, 784, 880, 784, 659, 784, 1047, 0, 880, 784, 698, 659, 784, 880, 784, 0];
       let bar = 0;
       const playBar = () => {
         if (!state.audio || state.audio.state === "suspended") return;
         const now = state.audio.currentTime + 0.04;
         const index = bar % chords.length;
-        softPad(chords[index], now, 1.7);
-        tone(bass[index], 1.32, 0.018, "sine", now + 0.02);
-        if (bar % 2 === 0) tone(chords[index][3], 0.46, 0.012, "sine", now + 0.54);
+        softPad(chords[index], now, 1.48);
+        tone(bass[index], 0.72, 0.02, "sine", now + 0.02);
+        tone(bass[index] * 1.5, 0.3, 0.011, "sine", now + 0.56);
+        for (let i = 0; i < 4; i += 1) {
+          const note = melody[(bar * 4 + i) % melody.length];
+          if (note) tone(note, 0.28, 0.018, "sine", now + 0.18 + i * 0.3);
+        }
         bar += 1;
       };
       playBar();
-      state.musicTimer = setInterval(playBar, 1520);
+      state.musicTimer = setInterval(playBar, 1280);
     }
 
     document.addEventListener("gesturestart", event => event.preventDefault());
