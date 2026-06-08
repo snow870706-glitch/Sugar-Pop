@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-  <title>Sugar Pop Match Demo</title>
+  <title>Sugar Pop Click Demo</title>
   <style>
     :root {
       --ink: #5a2d61;
       --panel: rgba(255, 255, 255, 0.78);
-      --cell: clamp(38px, 8.4vw, 68px);
+      --cell: clamp(38px, 12.2vw, 66px);
       font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     }
 
@@ -30,11 +30,10 @@
       margin: 0;
       color: var(--ink);
       background:
-        radial-gradient(circle at 15% 18%, rgba(255, 216, 77, 0.86) 0 18px, transparent 19px),
-        radial-gradient(circle at 86% 17%, rgba(110, 216, 255, 0.78) 0 25px, transparent 26px),
-        radial-gradient(circle at 78% 83%, rgba(255, 111, 177, 0.78) 0 23px, transparent 24px),
-        linear-gradient(160deg, #fff2b8 0%, #ffc3df 44%, #b7efff 100%);
-      overflow: hidden;
+        radial-gradient(circle at 12% 16%, rgba(255, 216, 77, 0.78) 0 18px, transparent 19px),
+        radial-gradient(circle at 86% 16%, rgba(63, 205, 255, 0.72) 0 24px, transparent 25px),
+        radial-gradient(circle at 82% 84%, rgba(255, 70, 153, 0.66) 0 24px, transparent 25px),
+        linear-gradient(160deg, #fff0a8 0%, #ffb7d8 45%, #a8ecff 100%);
       user-select: none;
     }
 
@@ -45,1401 +44,355 @@
       pointer-events: none;
       background-image:
         repeating-linear-gradient(45deg, rgba(255,255,255,0.34) 0 9px, transparent 9px 26px),
-        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.62), transparent 48%);
-      opacity: 0.52;
-    }
-
-    body.free-stage {
-      background:
-        radial-gradient(circle at 20% 18%, rgba(255, 255, 255, 0.92) 0 14px, transparent 15px),
-        radial-gradient(circle at 82% 20%, rgba(255, 216, 77, 0.9) 0 22px, transparent 23px),
-        radial-gradient(circle at 76% 82%, rgba(87, 224, 181, 0.78) 0 28px, transparent 29px),
-        linear-gradient(160deg, #4b169f 0%, #006f9d 50%, #22a976 100%);
-      color: #fff;
-    }
-
-    body.free-stage::before {
-      background-image:
-        repeating-linear-gradient(135deg, rgba(255,255,255,0.18) 0 8px, transparent 8px 22px),
-        radial-gradient(circle at 50% 20%, rgba(255,255,255,0.38), transparent 42%);
-      opacity: 0.78;
-    }
-
-    .free-transition {
-      position: fixed;
-      inset: 0;
-      z-index: 40;
-      display: none;
-      place-items: center;
-      pointer-events: none;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.96) 0 8%, rgba(255,216,77,0.92) 9% 24%, rgba(155,92,255,0.88) 25% 48%, rgba(0,111,157,0.92) 49% 100%);
-      color: white;
-      font-size: clamp(36px, 12vw, 72px);
-      font-weight: 1000;
-      text-shadow: 0 4px 0 rgba(71, 22, 120, 0.38), 0 0 26px rgba(255,255,255,0.8);
-    }
-
-    .free-transition.show {
-      display: grid;
-      animation: free-wipe 1280ms ease both;
+        radial-gradient(circle at 50% 100%, rgba(255,255,255,0.56), transparent 48%);
+      opacity: 0.56;
     }
 
     .app {
       position: relative;
-      width: min(100%, 560px);
+      z-index: 1;
+      width: min(100vw, 560px);
       height: 100dvh;
-      min-height: 0;
+      min-height: 100dvh;
       margin: 0 auto;
-      padding: max(16px, env(safe-area-inset-top)) 14px max(16px, env(safe-area-inset-bottom));
+      padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-rows: auto auto minmax(0, 1fr) auto;
-      gap: 12px;
-      overflow: hidden;
-    }
-
-    .bet-screen {
-      align-self: center;
-      display: grid;
-      gap: 18px;
-      padding: 22px 18px;
-      border: 3px solid rgba(255, 255, 255, 0.82);
-      border-radius: 28px;
-      background: var(--panel);
-      box-shadow: 0 18px 40px rgba(99, 44, 114, 0.26), inset 0 -6px 0 rgba(255, 128, 184, 0.18);
-      backdrop-filter: blur(8px);
-      text-align: center;
-    }
-
-    .bet-screen-title {
-      font-size: clamp(28px, 8vw, 42px);
-      line-height: 1;
-      font-weight: 1000;
-      color: var(--ink);
-      text-shadow: 0 3px 0 white;
-    }
-
-    .bet-screen-sub {
-      font-size: 13px;
-      font-weight: 900;
-      color: #9d4f7c;
-    }
-
-    .menu-balance {
-      width: min(100%, 300px);
-      min-height: 64px;
-      margin: 0 auto;
-      display: grid;
-      place-items: center;
-      border-radius: 20px;
-      background: rgba(255,255,255,0.7);
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.78), inset 0 -5px 0 rgba(87,224,181,0.16);
-    }
-
-    .menu-balance .label {
-      color: #2e9b7d;
-    }
-
-    .menu-balance-value {
-      margin-top: 2px;
-      font-size: clamp(24px, 7vw, 36px);
-      line-height: 1;
-      font-weight: 1000;
-      color: #16845b;
-      text-shadow: 0 2px 0 white;
-    }
-
-    .bet-picker {
-      width: min(100%, 300px);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 52px 1fr 52px;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .bet-picker-value {
-      min-height: 76px;
-      display: grid;
-      place-items: center;
-      border-radius: 22px;
-      background: rgba(255,255,255,0.68);
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.75), inset 0 -5px 0 rgba(255,128,184,0.14);
-      font-size: clamp(28px, 9vw, 42px);
-      font-weight: 1000;
-      color: #6f3ab8;
-      text-shadow: 0 2px 0 white;
-    }
-
-    .start-btn {
-      width: min(100%, 300px);
-      min-height: 58px;
-      margin: 0 auto;
-      border: 0;
-      border-radius: 22px;
-      cursor: pointer;
-      font: inherit;
-      font-size: 20px;
-      font-weight: 1000;
-      color: white;
-      background: linear-gradient(145deg, #57e0b5, #22a976 55%, #16845b);
-      text-shadow: 0 2px 0 rgba(0,0,0,0.14);
-      box-shadow: inset 0 4px 0 rgba(255,255,255,0.36), 0 10px 16px rgba(54, 127, 105, 0.24);
-      transition: transform 140ms ease, filter 140ms ease;
-    }
-
-    .start-btn:disabled {
-      cursor: not-allowed;
-      filter: grayscale(0.45) brightness(0.9);
-      opacity: 0.58;
-    }
-
-    .app.in-round .bet-screen { display: none; }
-    .app:not(.in-round) .topbar,
-    .app:not(.in-round) .jar-panel,
-    .app:not(.in-round) .board-wrap,
-    .app:not(.in-round) .controls { display: none; }
-
-    .topbar,
-    .jar-panel,
-    .controls {
-      border: 3px solid rgba(255, 255, 255, 0.82);
-      border-radius: 26px;
-      background: var(--panel);
-      box-shadow: 0 10px 28px rgba(139, 65, 117, 0.22), inset 0 -4px 0 rgba(255, 128, 184, 0.18);
-      backdrop-filter: blur(8px);
-    }
-
-    .topbar {
-      min-height: 84px;
-      padding: 12px 14px;
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      align-items: center;
-    }
-
-    .stat { min-width: 0; text-align: center; }
-
-    .jar-panel {
-      padding: 12px 14px;
-      display: grid;
-      grid-template-columns: auto 1fr auto;
-      gap: 12px;
-      align-items: center;
-    }
-
-    .jar-icon {
-      position: relative;
-      width: 54px;
-      height: 66px;
-      border: 4px solid rgba(255,255,255,0.9);
-      border-radius: 18px 18px 22px 22px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(255,255,255,0.28)),
-        linear-gradient(180deg, #ffd84d 0%, #ff8ec8 58%, #6ed8ff 100%);
-      box-shadow: inset 0 -8px 0 rgba(127, 45, 118, 0.15), 0 8px 18px rgba(99, 44, 114, 0.22);
-      overflow: hidden;
-    }
-
-    .jar-icon::before {
-      content: "";
-      position: absolute;
-      left: 9px;
-      right: 9px;
-      top: -7px;
-      height: 14px;
-      border-radius: 999px;
-      background: #8f4ed8;
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.42);
-    }
-
-    .jar-icon::after {
-      content: "";
-      position: absolute;
-      inset: 10px 12px auto auto;
-      width: 12px;
-      height: 28px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.46);
-      transform: rotate(16deg);
-    }
-
-    .jar-fill {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: var(--jar-fill, 0%);
-      background:
-        radial-gradient(circle at 18% 18%, #fff 0 3px, transparent 4px),
-        radial-gradient(circle at 70% 28%, #fff 0 2px, transparent 3px),
-        linear-gradient(180deg, #ff4d9d, #ffba3d);
-      transition: height 360ms cubic-bezier(.2,.86,.2,1);
-    }
-
-    .jar-main { min-width: 0; }
-
-    .jar-line {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 7px;
-    }
-
-    .jar-title {
-      font-size: 14px;
-      font-weight: 1000;
-      color: var(--ink);
-      text-shadow: 0 1px 0 white;
-    }
-
-    .jar-progress-text {
-      font-size: 12px;
-      font-weight: 900;
-      color: #9d4f7c;
-      white-space: nowrap;
-    }
-
-    .jar-track {
-      height: 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.66);
-      box-shadow: inset 0 2px 5px rgba(91, 42, 100, 0.18);
-      overflow: hidden;
-    }
-
-    .jar-bar {
-      width: var(--jar-width, 0%);
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #ff4d9d, #ffd84d, #57e0b5);
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.5), 0 0 14px rgba(255, 111, 177, 0.46);
-      transition: width 360ms cubic-bezier(.2,.86,.2,1);
-    }
-
-    .jar-reward {
-      min-width: 78px;
-      text-align: right;
-      font-size: 12px;
-      font-weight: 1000;
-      color: #6f3ab8;
-      text-shadow: 0 1px 0 white;
-    }
-
-    .jar-panel.ready {
-      animation: jar-ready 780ms ease both;
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.62), 0 0 30px rgba(255, 216, 77, 0.72);
-    }
-
-    .missions-panel {
-      grid-column: 1 / -1;
-      display: grid;
-      gap: 9px;
-    }
-
-    .mission-header {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .mission-title {
-      font-size: 15px;
-      font-weight: 1000;
-      color: var(--ink);
-      text-shadow: 0 1px 0 white;
-    }
-
-    .mission-status {
-      font-size: 12px;
-      font-weight: 1000;
-      color: #16845b;
-      text-align: right;
-      text-shadow: 0 1px 0 white;
-    }
-
-    .mission-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-rows: auto 1fr auto;
       gap: 8px;
     }
 
-    .mission-card {
-      min-height: 78px;
-      padding: 9px 10px;
-      border-radius: 16px;
-      background: rgba(255,255,255,0.66);
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.75), inset 0 -4px 0 rgba(255,128,184,0.12);
-      text-align: left;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
-    .mission-card.jackpot {
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.78), rgba(255,244,170,0.88)),
-        linear-gradient(145deg, #ffd84d, #ff8ec8);
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.86), 0 0 18px rgba(255, 216, 77, 0.55);
+    .brand {
+      display: grid;
+      gap: 0;
+      line-height: 1;
     }
 
-    .mission-name {
+    .brand-title {
+      font-size: clamp(24px, 8vw, 40px);
+      font-weight: 1000;
+      color: #ff337f;
+      text-shadow: 0 3px 0 #fff, 0 6px 14px rgba(117, 24, 87, 0.18);
+      letter-spacing: 0;
+    }
+
+    .brand-sub {
+      margin-top: 2px;
       font-size: 12px;
-      font-weight: 1000;
-      line-height: 1.18;
-      color: var(--ink);
+      font-weight: 900;
+      color: rgba(90, 45, 97, 0.72);
     }
 
-    .mission-progress {
-      margin-top: 7px;
-      height: 9px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.78);
-      overflow: hidden;
-      box-shadow: inset 0 1px 4px rgba(91, 42, 100, 0.18);
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
     }
 
-    .mission-fill {
-      width: var(--mission-fill, 0%);
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, #57e0b5, #ffd84d, #ff6fb1);
-      transition: width 260ms ease;
-    }
-
-    .mission-reward {
-      margin-top: 5px;
-      font-size: 11px;
-      font-weight: 1000;
-      color: #6f3ab8;
-    }
-
-    .free-status {
-      font-size: 11px;
-      color: #9d4f7c;
-      font-weight: 1000;
+    .stat {
+      min-width: 86px;
+      padding: 8px 10px;
+      border: 2px solid rgba(255, 255, 255, 0.72);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: 0 10px 24px rgba(150, 58, 113, 0.12), inset 0 1px 0 rgba(255,255,255,0.82);
     }
 
     .label {
       font-size: 11px;
       font-weight: 900;
-      color: #9d4f7c;
-      letter-spacing: 0;
+      color: rgba(90, 45, 97, 0.68);
       text-transform: uppercase;
     }
 
     .value {
-      margin-top: 3px;
-      font-size: clamp(18px, 5vw, 28px);
+      margin-top: 2px;
+      font-size: 22px;
       line-height: 1;
       font-weight: 1000;
-      color: var(--ink);
-      text-shadow: 0 2px 0 white;
+      color: #7b2c91;
     }
 
-    .board-wrap {
-      align-self: center;
+    .board-zone {
+      min-height: 0;
       display: grid;
-      place-items: center;
-      padding: 12px 0;
+      align-content: center;
+      justify-items: center;
+      gap: 8px;
     }
 
     .board {
       position: relative;
+      width: calc(var(--cell) * 7 + 18px);
+      height: calc(var(--cell) * 7 + 18px);
+      padding: 9px;
       display: grid;
       grid-template-columns: repeat(7, var(--cell));
       grid-template-rows: repeat(7, var(--cell));
-      gap: clamp(5px, 1.4vw, 8px);
-      padding: clamp(10px, 2.8vw, 16px);
-      border: 5px solid #ff86c3;
-      border-radius: 30px;
+      border-radius: 12px;
       background:
-        linear-gradient(135deg, rgba(255,255,255,0.64), rgba(255,232,247,0.84)),
-        repeating-linear-gradient(90deg, rgba(255,160,210,0.24) 0 16px, rgba(255,255,255,0.16) 16px 32px);
-      box-shadow:
-        0 18px 40px rgba(99, 44, 114, 0.28),
-        inset 0 0 0 4px rgba(255,255,255,0.46),
-        inset 0 -10px 0 rgba(196, 73, 160, 0.12);
+        linear-gradient(145deg, rgba(255,255,255,0.82), rgba(255,255,255,0.34)),
+        repeating-linear-gradient(45deg, rgba(255,255,255,0.16) 0 8px, transparent 8px 20px);
+      border: 2px solid rgba(255,255,255,0.86);
+      box-shadow: 0 18px 34px rgba(113, 38, 99, 0.22), inset 0 2px 0 rgba(255,255,255,0.85);
       touch-action: manipulation;
     }
 
     .cell {
-      position: relative;
+      width: var(--cell);
+      height: var(--cell);
       border: 0;
-      padding: 0;
-      border-radius: 19px;
-      background: rgba(255, 255, 255, 0.5);
-      box-shadow: inset 0 2px 0 rgba(255,255,255,0.7);
+      padding: 5px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.26);
+      border-radius: 8px;
       cursor: pointer;
-      transition: transform 170ms ease, filter 170ms ease, box-shadow 170ms ease;
+      touch-action: manipulation;
+      transition: transform 160ms ease, background 160ms ease;
     }
 
-    .cell:hover { transform: translateY(-2px); filter: brightness(1.05); }
-
-    .cell.selected {
-      outline: 4px solid white;
-      box-shadow: 0 0 0 5px #ff3f8f, 0 0 24px rgba(255, 63, 143, 0.78);
-      z-index: 3;
-    }
-
-    .cell.hint {
-      outline: 0;
-      box-shadow: 0 0 0 4px rgba(255,255,255,0.78), 0 0 24px rgba(255, 216, 77, 0.9);
-      z-index: 2;
-    }
-
-    .cell.hint .candy {
-      animation: hint-hop 760ms ease-in-out infinite;
-      filter: brightness(1.12) saturate(1.2);
-    }
-
-    .cell.swapping .candy { animation: swap-bounce 220ms ease both; }
-    .cell.clearing .candy { animation: candy-clear 260ms ease forwards; }
-    .cell.entering .candy { animation: candy-enter 320ms cubic-bezier(.18,.92,.22,1.15) both; }
-    .cell.settling .candy { animation: candy-settle 240ms ease both; }
-
-    .cell.blast-h::after,
-    .cell.blast-v::after,
-    .cell.blast-burst::after,
-    .cell.blast-color::after,
-    .cell.blast-h::before,
-    .cell.blast-v::before,
-    .cell.blast-burst::before,
-    .cell.blast-color::before,
-    .cell.color-charge::after {
-      content: "";
-      position: absolute;
-      pointer-events: none;
-      z-index: 4;
-    }
-
-    .cell.blast-h::after {
-      left: -9px;
-      right: -9px;
-      top: 44%;
-      height: 16%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.96), #6ed8ff, rgba(255,255,255,0.96), transparent);
-      box-shadow: 0 0 22px rgba(110, 216, 255, 0.98), 0 0 42px rgba(255,255,255,0.72);
-      animation: beam-h 560ms cubic-bezier(.18,.92,.22,1) both;
-    }
-
-    .cell.blast-h::before {
-      left: -4px;
-      right: -4px;
-      top: 30%;
-      height: 40%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
-      animation: beam-glow-h 620ms ease both;
-    }
-
-    .cell.blast-v::after {
-      top: -9px;
-      bottom: -9px;
-      left: 44%;
-      width: 16%;
-      border-radius: 999px;
-      background: linear-gradient(0deg, transparent, rgba(255,255,255,0.96), #ff6fb1, rgba(255,255,255,0.96), transparent);
-      box-shadow: 0 0 22px rgba(255, 111, 177, 0.98), 0 0 42px rgba(255,255,255,0.72);
-      animation: beam-v 560ms cubic-bezier(.18,.92,.22,1) both;
-    }
-
-    .cell.blast-v::before {
-      top: -4px;
-      bottom: -4px;
-      left: 30%;
-      width: 40%;
-      border-radius: 999px;
-      background: linear-gradient(0deg, transparent, rgba(255,255,255,0.38), transparent);
-      animation: beam-glow-v 620ms ease both;
-    }
-
-    .cell.blast-burst::after {
-      inset: -10px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.95) 0 18%, rgba(255,216,77,0.88) 19% 38%, rgba(255,63,143,0.5) 39% 58%, transparent 60%);
-      animation: burst-ring 660ms ease both;
-    }
-
-    .cell.blast-burst::before {
-      inset: -18px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.72) 0 12%, rgba(255,216,77,0.42) 13% 34%, rgba(255,63,143,0.24) 35% 52%, transparent 54%);
-      animation: burst-pulse 760ms ease both;
-    }
-
-    .cell.blast-color::after {
-      inset: -8px;
-      border-radius: 50%;
-      background: conic-gradient(#ff4d6d, #ffd84d, #57e0b5, #6ed8ff, #9b5cff, #ff4d6d);
-      opacity: 0.9;
-      mix-blend-mode: screen;
-      animation: color-sweep 720ms ease both;
-    }
-
-    .cell.blast-color::before {
-      inset: -15px;
-      border-radius: 50%;
-      border: 3px solid rgba(255,255,255,0.7);
-      box-shadow: 0 0 20px rgba(255,255,255,0.7), 0 0 32px rgba(155,92,255,0.58);
-      animation: color-orbit 760ms ease both;
-    }
-
-    .cell.color-charge::after {
-      inset: -5px;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle, rgba(255,255,255,0.95) 0 18%, transparent 19%),
-        conic-gradient(#ff4d6d, #ffd84d, #57e0b5, #6ed8ff, #9b5cff, #ff4d6d);
-      opacity: 0;
-      box-shadow: 0 0 18px rgba(255,255,255,0.9);
-      animation: color-charge 720ms ease both;
-    }
+    .cell:active { transform: scale(0.94); }
+    .cell.invalid { animation: shake 260ms ease; }
+    .cell.clearing .candy { animation: candy-clear 330ms ease forwards; }
+    .cell.entering .candy { animation: candy-enter 360ms cubic-bezier(.2, .95, .24, 1.05); }
+    .cell.settling .candy { animation: candy-settle 280ms cubic-bezier(.2, .95, .24, 1.05); }
+    .cell.hint { background: rgba(255,255,255,0.48); }
+    .cell.hint .candy { animation: hint-hop 760ms ease-in-out infinite; }
 
     .candy {
-      --shape-transform: scale(1);
-      --candy-shadow: rgba(93, 40, 102, 0.22);
-      position: absolute;
-      inset: 6px;
+      position: relative;
+      width: 88%;
+      height: 88%;
       border-radius: 50%;
-      pointer-events: none;
-      transform: var(--shape-transform);
-      transform-origin: 50% 58%;
-      box-shadow:
-        inset 0 7px 0 rgba(255,255,255,0.42),
-        inset 0 -9px 0 rgba(0,0,0,0.13),
-        inset 0 0 0 3px rgba(255,255,255,0.2),
-        0 7px 13px var(--candy-shadow);
+      filter: drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22));
+      transform-origin: center;
       overflow: hidden;
     }
 
     .candy::before {
       content: "";
       position: absolute;
-      inset: 7% 12% 58% 12%;
-      border-radius: 999px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(255,255,255,0.18));
-      transform: rotate(-12deg);
+      inset: 9% 12% 45% 18%;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.1));
+      transform: rotate(-18deg);
+      mix-blend-mode: screen;
     }
 
     .candy::after {
       content: "";
       position: absolute;
-      width: 20%;
-      height: 14%;
-      left: 22%;
-      top: 18%;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.88);
-      box-shadow: 10px 5px 16px rgba(255,255,255,0.28);
-      transform: rotate(-18deg);
+      inset: 15%;
+      border-radius: inherit;
+      background:
+        radial-gradient(circle at 38% 32%, rgba(255,255,255,0.9) 0 8%, transparent 9%),
+        radial-gradient(circle at 68% 78%, rgba(0,0,0,0.14) 0 20%, transparent 21%);
+      opacity: 0.72;
     }
 
     .type-0 {
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 33% 24%, #ffd5e2 0 10%, transparent 11%),
-        radial-gradient(circle at 68% 74%, rgba(172,0,54,0.22) 0 18%, transparent 19%),
-        linear-gradient(145deg, #ff5f8b, #f5144f 58%, #b90036);
+      border-radius: 50% 46% 52% 48%;
+      background: radial-gradient(circle at 32% 24%, #ff94b4 0 12%, #ff3f79 34%, #c90f4d 100%);
     }
 
     .type-1 {
-      border-radius: 15px;
-      background:
-        radial-gradient(circle at 30% 22%, #d9ffe9 0 11%, transparent 12%),
-        linear-gradient(145deg, #3ff09a, #00bd64 56%, #007f41);
-    }
-
-    .type-1::before {
-      inset: 10% 14% 62% 14%;
-      border-radius: 12px;
+      border-radius: 42% 58% 45% 55%;
+      background: radial-gradient(circle at 34% 24%, #ffe282 0 13%, #ffb82e 38%, #e06b00 100%);
     }
 
     .type-2 {
-      border-radius: 24px 18px 24px 18px;
-      clip-path: none;
-      background:
-        radial-gradient(circle at 32% 22%, #fff8bd 0 11%, transparent 12%),
-        linear-gradient(145deg, #ffe93c, #ffbd00 58%, #e27a00);
+      border-radius: 52% 48% 42% 58%;
+      background: radial-gradient(circle at 32% 24%, #98f7ff 0 12%, #1cc5f3 38%, #0876bd 100%);
     }
 
     .type-3 {
-      border-radius: 44% 56% 52% 48% / 58% 48% 52% 42%;
-      background:
-        radial-gradient(circle at 34% 23%, #d7fbff 0 10%, transparent 11%),
-        linear-gradient(145deg, #37dfff, #009fd1 55%, #006f9d);
+      border-radius: 46% 54% 56% 44%;
+      background: radial-gradient(circle at 34% 24%, #c1ff93 0 12%, #52d947 38%, #159844 100%);
     }
 
     .type-4 {
-      border-radius: 24px 14px 24px 14px;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,0.88) 0 10%, transparent 10% 90%, rgba(255,255,255,0.88) 90%),
-        radial-gradient(circle at 34% 24%, #ffe4b8 0 10%, transparent 11%),
-        linear-gradient(145deg, #ffb02e, #ff6b00 58%, #c54500);
-    }
-
-    .type-4::before {
-      inset: 12% 20% 60% 20%;
-      border-radius: 999px;
+      border-radius: 55% 45% 52% 48%;
+      background: radial-gradient(circle at 32% 24%, #d9b2ff 0 13%, #9a5cff 38%, #5a20c9 100%);
     }
 
     .type-5 {
-      border-radius: 18px;
-      clip-path: none;
-      background:
-        radial-gradient(circle at 33% 22%, #ead9ff 0 10%, transparent 11%),
-        linear-gradient(145deg, #a65cff, #7134e0 58%, #4b169f);
-    }
-
-    .special-striped-h,
-    .special-striped-v,
-    .special-wrapped,
-    .special-color {
-      box-shadow:
-        inset 0 6px 0 rgba(255,255,255,0.48),
-        inset 0 -7px 0 rgba(0,0,0,0.13),
-        0 0 0 3px rgba(255,255,255,0.62),
-        0 7px 14px rgba(93, 40, 102, 0.26);
-    }
-
-    .special-striped-h,
-    .special-striped-v {
-      outline: 3px solid rgba(255,255,255,0.72);
-    }
-
-    .special-striped-h::before,
-    .special-striped-v::before {
-      content: "";
-      position: absolute;
-      inset: 10%;
-      border-radius: inherit;
-      background:
-        repeating-linear-gradient(0deg,
-          rgba(255,255,255,0.92) 0 4px,
-          rgba(255,255,255,0.92) 4px,
-          transparent 5px,
-          transparent 11px);
-      opacity: 0.78;
-      mix-blend-mode: screen;
-    }
-
-    .special-striped-v::before {
-      background:
-        repeating-linear-gradient(90deg,
-          rgba(255,255,255,0.92) 0 4px,
-          rgba(255,255,255,0.92) 4px,
-          transparent 5px,
-          transparent 11px);
-    }
-
-    .special-striped-h::after,
-    .special-striped-v::after {
-      content: "";
-      position: absolute;
-      inset: 20% 39%;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 0 10px rgba(255,255,255,0.82);
-      transform: none;
-    }
-
-    .special-striped-v::after {
-      inset: 39% 20%;
-    }
-
-    .special-wrapped::before {
-      content: "";
-      position: absolute;
-      left: -7%;
-      right: -7%;
-      top: 24%;
-      bottom: 24%;
-      border-radius: 45% 55% 52% 48% / 58% 42% 58% 42%;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,0.9) 0 10%, rgba(255,216,77,0.82) 11% 19%, rgba(255,255,255,0.26) 20% 80%, rgba(255,216,77,0.82) 81% 89%, rgba(255,255,255,0.9) 90%),
-        radial-gradient(ellipse at 50% 45%, rgba(255,244,170,0.9), rgba(255,111,177,0.5) 58%, rgba(91,42,100,0.24) 100%);
-      box-shadow: inset 0 4px 0 rgba(255,255,255,0.58), inset 0 -7px 0 rgba(82,31,95,0.2), 0 0 0 2px rgba(255,255,255,0.65);
-      opacity: 1;
-      transform: none;
-    }
-
-    .special-wrapped::after {
-      width: auto;
-      height: auto;
-      left: 18%;
-      right: 18%;
-      top: 16%;
-      bottom: 16%;
-      border-radius: 38% 62% 45% 55% / 58% 48% 52% 42%;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.95) 0 14%, rgba(255,255,255,0.18) 15% 42%, rgba(255,216,77,0.62) 43% 56%, rgba(255,255,255,0.12) 57%),
-        repeating-linear-gradient(115deg, rgba(255,255,255,0.62) 0 4px, rgba(255,111,177,0.34) 4px 9px, transparent 9px 14px);
-      outline: 2px solid rgba(255,255,255,0.78);
-      box-shadow: 0 0 13px rgba(255,216,77,0.65), inset 0 -5px 0 rgba(82,31,95,0.13);
-      transform: rotate(-6deg);
-    }
-
-    .special-free {
-      --shape-transform: scale(0.94);
-      border-radius: 16px 16px 20px 20px;
-      clip-path: none;
-      background:
-        radial-gradient(circle at 34% 58%, #ff4d6d 0 8%, transparent 9%),
-        radial-gradient(circle at 58% 46%, #ffd84d 0 9%, transparent 10%),
-        radial-gradient(circle at 63% 68%, #57e0b5 0 8%, transparent 9%),
-        linear-gradient(145deg, rgba(255,255,255,0.92), rgba(110,216,255,0.44) 48%, rgba(155,92,255,0.38));
-      box-shadow:
-        inset 0 6px 0 rgba(255,255,255,0.72),
-        inset 0 -8px 0 rgba(80,39,129,0.2),
-        0 0 0 3px rgba(255,255,255,0.82),
-        0 0 18px rgba(110,216,255,0.72);
-    }
-
-    .special-free::before {
-      content: "";
-      position: absolute;
-      left: 16%;
-      right: 16%;
-      top: -2%;
-      height: 22%;
-      border-radius: 9px 9px 5px 5px;
-      background: linear-gradient(145deg, #9b5cff, #5f35b7);
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.45), 0 2px 0 rgba(255,255,255,0.65);
-      transform: none;
-    }
-
-    .special-free::after {
-      content: "";
-      position: absolute;
-      left: 20%;
-      top: 28%;
-      width: 18%;
-      height: 45%;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.58);
-      box-shadow: 18px -2px 12px rgba(255,255,255,0.22);
-      transform: rotate(10deg);
-    }
-
-    .cell.free-collect .candy {
-      animation: free-collect 780ms ease both;
-    }
-
-    .special-color {
-      --shape-transform: scale(1);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 32% 24%, white 0 8%, transparent 9%),
-        conic-gradient(#ff4d6d, #ffd84d, #57e0b5, #6ed8ff, #9b5cff, #ff4d6d);
+      border-radius: 48% 52% 58% 42%;
+      background: radial-gradient(circle at 34% 24%, #fff178 0 12%, #ffd22e 37%, #d69700 100%);
     }
 
     .controls {
-      padding: 12px;
       display: grid;
-      grid-template-columns: 1fr auto 1fr 1fr;
-      gap: 10px;
+      grid-template-columns: 1fr auto;
       align-items: center;
-    }
-
-    .betbox {
-      display: grid;
-      grid-template-columns: 40px 1fr 40px;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .round-btn,
-    .claim-btn,
-    .choose-bet-btn,
-    .reset-btn {
-      border: 0;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 1000;
-      color: white;
-      text-shadow: 0 2px 0 rgba(0,0,0,0.14);
-      box-shadow: inset 0 4px 0 rgba(255,255,255,0.36), 0 8px 14px rgba(118, 53, 119, 0.25);
-      transition: transform 140ms ease, filter 140ms ease;
-    }
-
-    .round-btn {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: linear-gradient(145deg, #9b5cff, #5f35b7);
-      font-size: 22px;
-    }
-
-    .bet-picker .round-btn {
-      width: 52px;
-      height: 52px;
-      font-size: 28px;
-    }
-
-    .round-btn:disabled {
-      cursor: not-allowed;
-      filter: grayscale(0.5) brightness(0.92);
-      opacity: 0.55;
-    }
-
-    .app.in-round .controls .betbox {
-      grid-template-columns: 1fr;
-      min-width: 118px;
-      text-align: center;
-    }
-
-    .app.in-round .controls .betbox .round-btn { display: none; }
-
-    .claim-btn {
-      min-height: 54px;
-      border-radius: 22px;
-      padding: 0 18px;
-      background: linear-gradient(145deg, #ff80be, #ff3f8f 52%, #d72e7f);
-      font-size: clamp(15px, 3.8vw, 19px);
-    }
-
-    .choose-bet-btn {
-      min-height: 54px;
-      border-radius: 22px;
-      padding: 0 16px;
-      background: linear-gradient(145deg, #9b5cff, #5f35b7);
-      font-size: clamp(14px, 3.5vw, 18px);
-    }
-
-    .claim-btn:disabled,
-    .choose-bet-btn:disabled {
-      cursor: not-allowed;
-      filter: grayscale(0.45) brightness(0.9);
-      opacity: 0.56;
-      box-shadow: inset 0 4px 0 rgba(255,255,255,0.22), 0 4px 8px rgba(118, 53, 119, 0.16);
-    }
-
-    .reset-btn {
-      min-height: 44px;
-      border-radius: 18px;
-      background: linear-gradient(145deg, #6ed8ff, #3998ef);
-      padding: 0 14px;
-    }
-
-    .round-btn:active,
-    .claim-btn:active,
-    .choose-bet-btn:active,
-    .reset-btn:active { transform: translateY(2px) scale(0.98); }
-
-    .bet-value {
-      min-width: 52px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: 1000;
-      text-shadow: 0 2px 0 white;
+      gap: 8px;
     }
 
     .toast {
-      min-height: 22px;
-      text-align: center;
+      min-height: 38px;
+      padding: 9px 12px;
+      display: flex;
+      align-items: center;
+      border-radius: 8px;
+      color: rgba(90, 45, 97, 0.86);
       font-size: 13px;
       font-weight: 900;
-      color: #843b74;
+      background: rgba(255,255,255,0.58);
+      border: 2px solid rgba(255,255,255,0.58);
+      box-shadow: 0 10px 22px rgba(113, 38, 99, 0.1);
+    }
+
+    .hint-btn {
+      height: 38px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #ff4b93, #7d42ff);
+      box-shadow: 0 10px 20px rgba(119, 39, 144, 0.24), inset 0 1px 0 rgba(255,255,255,0.42);
+      cursor: pointer;
+      touch-action: manipulation;
     }
 
     .score-pop {
       position: absolute;
-      z-index: 6;
-      min-width: 62px;
-      padding: 5px 9px;
-      border-radius: 999px;
-      text-align: center;
-      font-size: 14px;
+      left: calc(9px + var(--c) * var(--cell) + var(--cell) * 0.34);
+      top: calc(9px + var(--r) * var(--cell) + var(--cell) * 0.18);
+      z-index: 4;
+      min-width: 58px;
+      padding: 5px 7px;
+      border-radius: 8px;
+      color: #fff;
       font-weight: 1000;
-      color: white;
-      text-shadow: 0 2px 0 rgba(86, 35, 92, 0.3);
-      background: linear-gradient(145deg, #ff6fb1, #ff3f8f);
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.4), 0 7px 14px rgba(118, 53, 119, 0.28);
+      font-size: 14px;
+      text-align: center;
       pointer-events: none;
-      transform: translate(-50%, -50%);
-      animation: score-pop 850ms ease both;
+      background: linear-gradient(135deg, #ff3c82, #ffb82e);
+      text-shadow: 0 1px 0 rgba(70, 20, 82, 0.4);
+      box-shadow: 0 8px 18px rgba(126, 42, 99, 0.28);
+      animation: score-pop 860ms ease both;
     }
 
-    .score-pop.combo {
-      min-width: 82px;
-      background: linear-gradient(145deg, #7d35ff, #00d69a);
-      box-shadow: inset 0 3px 0 rgba(255,255,255,0.46), 0 0 22px rgba(125,53,255,0.42), 0 8px 16px rgba(31, 120, 100, 0.24);
-      animation-delay: 80ms;
-    }
+    .score-pop.combo { background: linear-gradient(135deg, #7d42ff, #1cc5f3); }
 
-    @keyframes swap-bounce {
-      0% { transform: var(--shape-transform) scale(1); }
-      50% { transform: var(--shape-transform) scale(0.86) rotate(4deg); }
-      100% { transform: var(--shape-transform) scale(1); }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-4px); }
+      50% { transform: translateX(4px); }
+      75% { transform: translateX(-2px); }
     }
 
     @keyframes candy-clear {
-      0% { opacity: 1; transform: var(--shape-transform) scale(1) rotate(0); filter: brightness(1); }
-      60% { opacity: 1; transform: var(--shape-transform) scale(1.18) rotate(8deg); filter: brightness(1.2); }
-      100% { opacity: 0; transform: var(--shape-transform) scale(0.15) rotate(18deg); filter: brightness(1.4); }
+      0% { opacity: 1; transform: scale(1); filter: brightness(1.1) drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22)); }
+      55% { opacity: 1; transform: scale(1.18) rotate(8deg); filter: brightness(1.35) drop-shadow(0 0 18px rgba(255,255,255,0.9)); }
+      100% { opacity: 0; transform: scale(0.22) rotate(-14deg); }
     }
 
     @keyframes candy-enter {
-      0% { opacity: 0; transform: translateY(-28px) var(--shape-transform) scale(0.55); }
-      70% { opacity: 1; transform: translateY(4px) var(--shape-transform) scale(1.06); }
-      100% { opacity: 1; transform: translateY(0) var(--shape-transform) scale(1); }
+      0% { opacity: 0; transform: translateY(calc(var(--cell) * -1.2)) scale(0.82); }
+      74% { opacity: 1; transform: translateY(4px) scale(1.04); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     @keyframes candy-settle {
-      0% { transform: translateY(-10px) var(--shape-transform) scale(0.98); }
-      70% { transform: translateY(3px) var(--shape-transform) scale(1.02); }
-      100% { transform: translateY(0) var(--shape-transform) scale(1); }
-    }
-
-    @keyframes beam-h {
-      0% { opacity: 0; transform: scaleX(0.2); }
-      45% { opacity: 1; transform: scaleX(1.2); }
-      100% { opacity: 0; transform: scaleX(1.55); }
-    }
-
-    @keyframes beam-v {
-      0% { opacity: 0; transform: scaleY(0.2); }
-      45% { opacity: 1; transform: scaleY(1.2); }
-      100% { opacity: 0; transform: scaleY(1.55); }
-    }
-
-    @keyframes beam-glow-h {
-      0% { opacity: 0; transform: scaleX(0.15); filter: blur(0); }
-      42% { opacity: 0.9; transform: scaleX(1.35); filter: blur(2px); }
-      100% { opacity: 0; transform: scaleX(1.9); filter: blur(5px); }
-    }
-
-    @keyframes beam-glow-v {
-      0% { opacity: 0; transform: scaleY(0.15); filter: blur(0); }
-      42% { opacity: 0.9; transform: scaleY(1.35); filter: blur(2px); }
-      100% { opacity: 0; transform: scaleY(1.9); filter: blur(5px); }
-    }
-
-    @keyframes burst-ring {
-      0% { opacity: 0; transform: scale(0.25); }
-      45% { opacity: 1; transform: scale(0.95); }
-      100% { opacity: 0; transform: scale(1.45); }
-    }
-
-    @keyframes burst-pulse {
-      0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-      35% { opacity: 0.95; transform: scale(0.9) rotate(20deg); }
-      68% { opacity: 0.62; transform: scale(1.28) rotate(-12deg); }
-      100% { opacity: 0; transform: scale(1.72) rotate(0deg); }
-    }
-
-    @keyframes color-sweep {
-      0% { opacity: 0; transform: rotate(0deg) scale(0.35); }
-      45% { opacity: 0.95; transform: rotate(160deg) scale(1.12); }
-      100% { opacity: 0; transform: rotate(320deg) scale(1.45); }
-    }
-
-    @keyframes color-orbit {
-      0% { opacity: 0; transform: rotate(0deg) scale(0.28); }
-      34% { opacity: 1; transform: rotate(120deg) scale(1); }
-      70% { opacity: 0.82; transform: rotate(270deg) scale(1.22); }
-      100% { opacity: 0; transform: rotate(460deg) scale(1.55); }
-    }
-
-    @keyframes color-charge {
-      0% { opacity: 0; transform: rotate(0deg) scale(0.2); }
-      35% { opacity: 0.95; transform: rotate(120deg) scale(1.05); }
-      70% { opacity: 0.75; transform: rotate(250deg) scale(0.9); }
-      100% { opacity: 0; transform: rotate(360deg) scale(1.3); }
-    }
-
-    @keyframes score-pop {
-      0% { opacity: 0; transform: translate(-50%, 4px) scale(0.7); }
-      22% { opacity: 1; transform: translate(-50%, -8px) scale(1.08); }
-      74% { opacity: 1; transform: translate(-50%, -22px) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -38px) scale(0.92); }
+      0% { transform: translateY(calc(var(--cell) * -0.6)) scale(0.96); }
+      70% { transform: translateY(3px) scale(1.03); }
+      100% { transform: translateY(0) scale(1); }
     }
 
     @keyframes hint-hop {
-      0%, 100% { transform: var(--shape-transform) translateY(0) scale(1); }
-      38% { transform: var(--shape-transform) translateY(-10px) scale(1.06); }
-      62% { transform: var(--shape-transform) translateY(2px) scale(0.98); }
+      0%, 100% { transform: translateY(0) scale(1); }
+      42% { transform: translateY(-7px) scale(1.04); }
     }
 
-    @keyframes jar-ready {
-      0% { transform: scale(1); }
-      36% { transform: scale(1.025); }
-      72% { transform: scale(0.992); }
-      100% { transform: scale(1); }
-    }
-
-    @keyframes free-collect {
-      0% { transform: var(--shape-transform) scale(1); filter: brightness(1); }
-      36% { transform: var(--shape-transform) scale(1.28) rotate(14deg); filter: brightness(1.35) saturate(1.35); }
-      72% { transform: var(--shape-transform) scale(0.82) rotate(-10deg); opacity: 0.9; }
-      100% { transform: var(--shape-transform) scale(0.08); opacity: 0; }
-    }
-
-    @keyframes free-wipe {
-      0% { opacity: 0; clip-path: circle(0% at 50% 50%); transform: scale(0.92); }
-      24% { opacity: 1; clip-path: circle(34% at 50% 50%); transform: scale(1); }
-      68% { opacity: 1; clip-path: circle(120% at 50% 50%); transform: scale(1.02); }
-      100% { opacity: 0; clip-path: circle(160% at 50% 50%); transform: scale(1.08); }
-    }
-
-    @media (max-width: 430px), (max-height: 860px) {
-      :root {
-        --cell: clamp(34px, 10.8vw, 43px);
-      }
-
-      .app {
-        width: 100%;
-        padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
-        gap: 6px;
-      }
-
-      .topbar,
-      .jar-panel,
-      .controls {
-        border-width: 2px;
-        border-radius: 18px;
-      }
-
-      .topbar {
-        min-height: 50px;
-        padding: 7px 8px;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 5px;
-      }
-
-      .label {
-        font-size: 9px;
-      }
-
-      .value {
-        margin-top: 2px;
-        font-size: clamp(14px, 4.4vw, 19px);
-      }
-
-      .jar-panel {
-        padding: 7px 8px;
-      }
-
-      .missions-panel {
-        gap: 5px;
-      }
-
-      .mission-header {
-        min-height: 16px;
-      }
-
-      .mission-title {
-        font-size: 12px;
-      }
-
-      .mission-status,
-      .free-status {
-        font-size: 10px;
-      }
-
-      .mission-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 5px;
-      }
-
-      .mission-card {
-        min-height: 50px;
-        padding: 5px 6px;
-        border-radius: 11px;
-      }
-
-      .mission-name {
-        font-size: 10px;
-        line-height: 1.08;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-
-      .mission-progress {
-        margin-top: 4px;
-        height: 6px;
-      }
-
-      .mission-reward {
-        margin-top: 3px;
-        font-size: 9px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .board-wrap {
-        min-height: 0;
-        align-self: stretch;
-        padding: 2px 0;
-      }
-
-      .board {
-        gap: 4px;
-        padding: 8px;
-        border-width: 3px;
-        border-radius: 20px;
-      }
-
-      .cell {
-        border-radius: 13px;
-      }
-
-      .candy {
-        inset: 4px;
-      }
-
-      .controls {
-        padding: 7px;
-        grid-template-columns: 0.78fr auto 1fr 0.9fr;
-        gap: 6px;
-      }
-
-      .reset-btn,
-      .claim-btn,
-      .choose-bet-btn {
-        min-height: 38px;
-        border-radius: 14px;
-        padding: 0 8px;
-        font-size: 12px;
-      }
-
-      .app.in-round .controls .betbox {
-        min-width: 78px;
-      }
-
-      .bet-value {
-        font-size: 16px;
-      }
-
-      .bet-screen {
-        gap: 12px;
-        padding: 18px 14px;
-      }
-
-      .bet-screen-title {
-        font-size: 34px;
-      }
-
-      .menu-balance {
-        min-height: 56px;
-      }
-
-      .bet-picker-value {
-        min-height: 64px;
-      }
+    @keyframes score-pop {
+      0% { opacity: 0; transform: translateY(10px) scale(0.76); }
+      18% { opacity: 1; transform: translateY(-4px) scale(1.08); }
+      100% { opacity: 0; transform: translateY(-34px) scale(0.94); }
     }
 
     @media (max-height: 760px) {
-      :root {
-        --cell: clamp(31px, 9.6vw, 39px);
-      }
+      :root { --cell: clamp(34px, 11.5vw, 56px); }
+      .app { gap: 6px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .brand-title { font-size: clamp(22px, 7vw, 34px); }
+      .brand-sub { display: none; }
+      .stat { padding: 7px 9px; }
+      .value { font-size: 20px; }
+    }
 
-      .app {
-        gap: 4px;
-      }
-
-      .topbar {
-        min-height: 44px;
-        padding: 5px 7px;
-      }
-
-      .mission-card {
-        min-height: 44px;
-      }
-
-      .mission-progress {
-        display: none;
-      }
-
-      .board {
-        gap: 3px;
-        padding: 7px;
-      }
-
-      .reset-btn,
-      .claim-btn,
-      .choose-bet-btn {
-        min-height: 34px;
-      }
+    @media (max-width: 390px) {
+      :root { --cell: clamp(34px, 11.5vw, 54px); }
+      .toast { font-size: 12px; }
+      .hint-btn { padding: 0 12px; }
     }
   </style>
 </head>
 <body>
-  <div class="free-transition" id="freeTransition">FREE MODE</div>
-  <main class="app" id="app">
-    <section class="bet-screen" id="betScreen" aria-label="bet selection">
-      <div>
-        <div class="bet-screen-title">Sugar Pop</div>
-        <div class="bet-screen-sub" id="betScreenSub">選擇 Bet 後開始本局</div>
+  <main class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-title">Sugar Pop</div>
+        <div class="brand-sub">點擊 3 顆以上相連糖果</div>
       </div>
-      <div class="bet-picker" aria-label="round bet selector">
-        <button class="round-btn" id="menuBetDown" aria-label="decrease bet">-</button>
-        <div class="bet-picker-value" id="menuBet">$10</div>
-        <button class="round-btn" id="menuBetUp" aria-label="increase bet">+</button>
-      </div>
-      <button class="start-btn" id="startGame">開始遊戲</button>
-    </section>
-
-    <section class="topbar" aria-label="game status">
-      <div class="stat">
-        <div class="label">Balance</div>
-        <div class="value" id="balance">$1350</div>
-      </div>
-      <div class="stat">
-        <div class="label">Base</div>
-        <div class="value" id="score">0</div>
-      </div>
-      <div class="stat">
-        <div class="label">Combo</div>
-        <div class="value" id="multiplier">x1.00</div>
-      </div>
-      <div class="stat">
-        <div class="label">Total</div>
-        <div class="value" id="total">0</div>
-      </div>
-    </section>
-
-    <section class="jar-panel" id="jarPanel" aria-label="sugar jar mission">
-      <div class="jar-icon" id="jarIcon"><div class="jar-fill" id="jarFill"></div></div>
-      <div class="jar-main">
-        <div class="jar-line">
-          <div class="jar-title">糖罐任務 Lv.<span id="jarLevel">1</span></div>
-          <div class="jar-progress-text" id="jarText">0 / 70</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="label">Score</div>
+          <div class="value" id="score">0</div>
         </div>
-        <div class="jar-track"><div class="jar-bar" id="jarBar"></div></div>
+        <div class="stat">
+          <div class="label">Combo</div>
+          <div class="value" id="combo">x1.0</div>
+        </div>
       </div>
-      <div class="jar-reward" id="jarReward">滿罐 +$15.0</div>
-    </section>
+    </header>
 
-    <section class="board-wrap">
+    <section class="board-zone">
       <div class="board" id="board" aria-label="candy board"></div>
     </section>
 
     <section class="controls">
-      <button class="reset-btn" id="hint">提示</button>
-      <div class="betbox" aria-label="bet controls">
-        <button class="round-btn" id="betDown" aria-label="decrease bet">-</button>
-        <div>
-          <div class="label">Bet</div>
-          <div class="bet-value" id="bet">$10</div>
-        </div>
-        <button class="round-btn" id="betUp" aria-label="increase bet">+</button>
-      </div>
-      <button class="claim-btn" id="claim">收下糖幣</button>
-      <button class="choose-bet-btn" id="chooseBet">選擇 Bet</button>
+      <div class="toast" id="toast">點擊 3 顆以上相連的同色糖果。</div>
+      <button class="hint-btn" id="hint" type="button">提示</button>
     </section>
-
-    <div class="toast" id="toast">點一顆糖果，再點旁邊一顆交換。</div>
-    </div>
   </main>
 
   <script>
     const size = 7;
     const candyTypes = 6;
+    const minGroup = 3;
+    const comboWindow = 2000;
 
     const state = {
-      balance: 1350,
-      bet: 10,
-      score: 0,
-      totalScore: 0,
-      comboMultiplier: 1,
-      inRound: false,
-      jar: {
-        level: 1,
-        progress: 0,
-        justCompleted: false
-      },
-      betStates: new Map(),
       board: [],
-      selected: null,
-      dragStart: null,
-      suppressClick: false,
+      score: 0,
+      combo: 0,
+      lastClearAt: 0,
+      busy: false,
       hint: [],
       clearing: new Set(),
-      effects: new Map(),
       entering: new Set(),
       settling: new Set(),
-      swapping: new Set(),
+      invalid: new Set(),
       popups: [],
+      hintTimer: null,
       audio: null,
-      musicTimer: null,
-      idleTimer: null,
-      busy: false
+      musicTimer: null
     };
 
     const els = {
       board: document.querySelector("#board"),
-      balance: document.querySelector("#balance"),
       score: document.querySelector("#score"),
-      multiplier: document.querySelector("#multiplier"),
-      total: document.querySelector("#total"),
-      bet: document.querySelector("#bet"),
+      combo: document.querySelector("#combo"),
       toast: document.querySelector("#toast"),
-      claim: document.querySelector("#claim"),
-      chooseBet: document.querySelector("#chooseBet"),
-      betDown: document.querySelector("#betDown"),
-      betUp: document.querySelector("#betUp"),
-      hint: document.querySelector("#hint"),
-      app: document.querySelector("#app"),
-      betScreen: document.querySelector("#betScreen"),
-      betScreenSub: document.querySelector("#betScreenSub"),
-      menuBet: document.querySelector("#menuBet"),
-      menuBetDown: document.querySelector("#menuBetDown"),
-      menuBetUp: document.querySelector("#menuBetUp"),
-      startGame: document.querySelector("#startGame"),
-      freeTransition: document.querySelector("#freeTransition"),
-      jarPanel: document.querySelector("#jarPanel"),
-      jarFill: document.querySelector("#jarFill"),
-      jarBar: document.querySelector("#jarBar"),
-      jarLevel: document.querySelector("#jarLevel"),
-      jarText: document.querySelector("#jarText"),
-      jarReward: document.querySelector("#jarReward"),
+      hint: document.querySelector("#hint")
     };
-
-    const menuBalancePanel = document.createElement("div");
-    menuBalancePanel.className = "menu-balance";
-    menuBalancePanel.setAttribute("aria-label", "current balance");
-    menuBalancePanel.innerHTML = `<div><div class="label">\u76ee\u524d\u9918\u984d</div><div class="menu-balance-value" id="menuBalance">$1350.0</div></div>`;
-    els.betScreen.insertBefore(menuBalancePanel, els.betScreen.children[1]);
-    els.menuBalance = document.querySelector("#menuBalance");
-
-    els.hint.textContent = "\u63d0\u793a";
-    els.claim.textContent = "\u6536\u4e0b\u7cd6\u5e63";
-    els.chooseBet.textContent = "\u9078\u64c7 Bet";
-    els.startGame.textContent = "\u958b\u59cb\u904a\u6232";
-    els.betScreenSub.textContent = "\u9078\u64c7 Bet \u5f8c\u958b\u59cb\u672c\u5c40";
-    els.toast.textContent = "\u9ede\u4e00\u9846\u7cd6\u679c\uff0c\u518d\u9ede\u6216\u62d6\u66f3\u65c1\u908a\u4e00\u9846\u4ea4\u63db\u3002";
-
-    els.jarPanel.classList.add("missions-panel");
-    els.jarPanel.style.gridTemplateColumns = "1fr";
-    els.jarPanel.innerHTML = `
-      <div class="mission-header">
-        <div>
-          <div class="mission-title">\u652f\u7dda\u4efb\u52d9</div>
-          <div class="free-status" id="freeStatus">Free \u7cd6\u679c 0/3</div>
-        </div>
-        <div class="mission-status" id="missionBonus">Win x1.00</div>
-      </div>
-      <div class="mission-grid" id="missionGrid"></div>
-    `;
-    els.missionGrid = document.querySelector("#missionGrid");
-    els.freeStatus = document.querySelector("#freeStatus");
-    els.missionBonus = document.querySelector("#missionBonus");
-
-    state.missions = [];
-    state.missionSerial = 0;
-    state.winMultiplier = 1;
-    state.freeMoves = 0;
-    state.freeMode = false;
-    state.freeCollecting = false;
-    state.suppressFreeSpawn = false;
-    state.mainBoardSnapshot = null;
-    state.returningFromFree = false;
 
     function keyOf(pos) {
       return `${pos.r},${pos.c}`;
@@ -1450,90 +403,33 @@
       return { r, c };
     }
 
+    function inBounds(r, c) {
+      return r >= 0 && r < size && c >= 0 && c < size;
+    }
+
     function randomCandy() {
       return Math.floor(Math.random() * candyTypes);
     }
 
-    function makeCell(type = randomCandy(), special = null) {
-      return { type, special };
+    function makeCell(type = randomCandy()) {
+      return { type };
     }
 
-    function cloneBoard(board) {
-      return board.map(row => row.map(cell => cell ? { type: cell.type, special: cell.special } : null));
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
     }
 
-    function saveBetState() {
-      if (!state.board.length) return;
-      state.betStates.set(state.bet, {
-        board: cloneBoard(state.board),
-        score: state.score,
-        totalScore: state.totalScore,
-        comboMultiplier: state.comboMultiplier
-      });
+    function formatScore(value) {
+      return Math.round(value).toLocaleString("en-US");
     }
 
-    function createFreshBoard() {
-      state.board = Array.from({ length: size }, () =>
-        Array.from({ length: size }, () => makeCell())
-      );
-      removeStartingMatches();
-      ensurePlayableBoard();
+    function setToast(text) {
+      els.toast.textContent = text;
     }
 
-    function loadBetState(bet) {
-      const saved = state.betStates.get(bet);
-      state.selected = null;
-      state.dragStart = null;
-      state.hint = [];
-      clearEffects();
-
-      if (saved) {
-        state.board = cloneBoard(saved.board);
-        state.score = saved.score;
-        state.totalScore = saved.totalScore;
-        state.comboMultiplier = saved.comboMultiplier;
-      } else {
-        state.score = 0;
-        state.totalScore = 0;
-        state.comboMultiplier = 1;
-        createFreshBoard();
-      }
-
-      updateUI();
-      render();
-      resetIdleHint();
-    }
-
-    function startRound() {
-      if (state.busy) return;
-      createFreshBoard();
-      state.inRound = true;
-      state.score = 0;
-      state.totalScore = 0;
-      state.comboMultiplier = 1;
-      state.selected = null;
-      state.dragStart = null;
-      state.hint = [];
-      clearEffects();
-      state.betStates.set(state.bet, {
-        board: cloneBoard(state.board),
-        score: state.score,
-        totalScore: state.totalScore,
-        comboMultiplier: state.comboMultiplier
-      });
-      updateUI();
-      render();
-      resetIdleHint();
-      setToast("純三消版本已準備好。4 顆會做條紋糖，5 顆會做特殊糖。");
-    }
-
-    function clearEffects() {
-      state.clearing.clear();
-      state.effects.clear();
-      state.entering.clear();
-      state.settling.clear();
-      state.swapping.clear();
-      state.popups = [];
+    function updateUI() {
+      els.score.textContent = formatScore(state.score);
+      els.combo.textContent = `x${comboMultiplier().toFixed(1)}`;
     }
 
     function render() {
@@ -1541,2015 +437,278 @@
       for (let r = 0; r < size; r += 1) {
         for (let c = 0; c < size; c += 1) {
           const cell = state.board[r][c];
-          const posKey = `${r},${c}`;
           const button = document.createElement("button");
-          button.className = "cell";
           button.type = "button";
+          button.className = "cell";
           button.dataset.r = r;
           button.dataset.c = c;
-
-          if (state.selected && state.selected.r === r && state.selected.c === c) button.classList.add("selected");
+          button.setAttribute("aria-label", `candy ${r + 1}-${c + 1}`);
+          const key = keyOf({ r, c });
+          if (state.clearing.has(key)) button.classList.add("clearing");
+          if (state.entering.has(key)) button.classList.add("entering");
+          if (state.settling.has(key)) button.classList.add("settling");
+          if (state.invalid.has(key)) button.classList.add("invalid");
           if (state.hint.some(pos => pos.r === r && pos.c === c)) button.classList.add("hint");
-          if (state.clearing.has(posKey)) button.classList.add("clearing");
-          const effect = state.effects.get(posKey);
-          if (effect) button.classList.add(effect);
-          if (state.entering.has(posKey)) button.classList.add("entering");
-          if (state.settling.has(posKey)) button.classList.add("settling");
-          if (state.swapping.has(posKey)) button.classList.add("swapping");
-
           if (cell) {
             const candy = document.createElement("div");
-            candy.className = `candy ${cell.special === "color" ? "special-color" : `type-${cell.type}`}`;
-            if (cell.special && cell.special !== "color") candy.classList.add(`special-${cell.special}`);
+            candy.className = `candy type-${cell.type}`;
             button.appendChild(candy);
           }
-
           els.board.appendChild(button);
         }
       }
 
       for (const popup of state.popups) {
         const badge = document.createElement("div");
-        badge.className = `score-pop ${popup.kind === "combo" ? "combo" : ""}`;
+        badge.className = `score-pop ${popup.combo ? "combo" : ""}`;
+        badge.style.setProperty("--r", popup.r);
+        badge.style.setProperty("--c", popup.c);
         badge.textContent = popup.text;
-        badge.style.left = `${((popup.c + 0.5) / size) * 100}%`;
-        badge.style.top = `${((popup.r + 0.5) / size) * 100}%`;
         els.board.appendChild(badge);
       }
     }
 
-    els.board.addEventListener("click", event => {
-      if (state.suppressClick) {
-        state.suppressClick = false;
-        return;
-      }
-      const cell = event.target.closest(".cell");
-      if (!cell || !els.board.contains(cell)) return;
-      selectCell(Number(cell.dataset.r), Number(cell.dataset.c));
-    });
-
-    els.board.addEventListener("pointerdown", event => {
-      const cell = event.target.closest(".cell");
-      if (!cell || !els.board.contains(cell) || state.busy) return;
-      clearIdleHint();
-      startAudio();
-      playSound("select");
-      cell.setPointerCapture?.(event.pointerId);
-      state.dragStart = {
-        r: Number(cell.dataset.r),
-        c: Number(cell.dataset.c),
-        x: event.clientX,
-        y: event.clientY,
-        didDrag: false
-      };
-    });
-
-    els.board.addEventListener("pointermove", event => {
-      if (!state.dragStart || state.busy) return;
-      const start = state.dragStart;
-      const dx = event.clientX - start.x;
-      const dy = event.clientY - start.y;
-      const threshold = 20;
-      if (Math.abs(dx) <= threshold && Math.abs(dy) <= threshold) return;
-
-      const target = Math.abs(dx) > Math.abs(dy)
-        ? { r: start.r, c: start.c + Math.sign(dx) }
-        : { r: start.r + Math.sign(dy), c: start.c };
-
-      state.dragStart = null;
-      state.suppressClick = true;
-      setTimeout(() => {
-        state.suppressClick = false;
-      }, 240);
-
-      if (!inBounds(target.r, target.c) || !isAdjacent(start, target)) return;
-      selectDraggedPair(start, target);
-    });
-
-    els.board.addEventListener("pointerup", event => {
-      if (!state.dragStart || state.busy) {
-        state.dragStart = null;
-        return;
-      }
-
-      const start = state.dragStart;
-      const dx = event.clientX - start.x;
-      const dy = event.clientY - start.y;
-      const threshold = 18;
-      let target = null;
-
-      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-        start.didDrag = true;
-        state.suppressClick = true;
-        setTimeout(() => {
-          state.suppressClick = false;
-        }, 220);
-        if (Math.abs(dx) > Math.abs(dy)) target = { r: start.r, c: start.c + Math.sign(dx) };
-        else target = { r: start.r + Math.sign(dy), c: start.c };
-      } else {
-        const cell = event.target.closest(".cell");
-        if (cell && els.board.contains(cell)) target = { r: Number(cell.dataset.r), c: Number(cell.dataset.c) };
-      }
-
-      state.dragStart = null;
-      if (!target || !inBounds(target.r, target.c) || (target.r === start.r && target.c === start.c)) return;
-      if (!isAdjacent(start, target)) return;
-      selectDraggedPair(start, target);
-    });
-
-    els.board.addEventListener("pointercancel", () => {
-      state.dragStart = null;
-    });
-
-    async function selectDraggedPair(a, b) {
-      if (state.busy) return;
-      state.selected = null;
-      state.hint = [];
-      if (!canSwapClear(a, b)) {
-        render();
-        playSound("invalid");
-        setToast("這個方向不會消除，試試另一邊。");
-        return;
-      }
-      await trySwap(a, b);
+    function createBoard() {
+      do {
+        state.board = Array.from({ length: size }, () =>
+          Array.from({ length: size }, () => makeCell())
+        );
+      } while (!findClickableGroups().length);
     }
 
-    async function selectCell(r, c) {
-      if (state.busy) return;
-      clearIdleHint();
-      state.hint = [];
-
-      if (!state.selected) {
-        state.selected = { r, c };
-        render();
-        setToast("已選取糖果，再點旁邊一顆交換。");
-        return;
-      }
-
-      const first = state.selected;
-      const second = { r, c };
-
-      if (first.r === r && first.c === c) {
-        state.selected = null;
-        render();
-        return;
-      }
-
-      if (!isAdjacent(first, second)) {
-        state.selected = second;
-        render();
-        setToast("請點相鄰的糖果，或按提示找一組。");
-        return;
-      }
-
-      if (!canSwapClear(first, second)) {
-        state.selected = second;
-        render();
-        playSound("invalid");
-        setToast("這步不會消除，請改選另一顆。");
-        return;
-      }
-
-      await trySwap(first, second);
-    }
-
-    function canSwapClear(a, b) {
-      swap(a, b);
-      const works = findMatchGroups().length > 0 || Boolean(specialSwapGroup(a, b)) || Boolean(colorSwapGroup(a, b));
-      swap(a, b);
-      return works;
-    }
-
-    function specialSwapGroup(a, b) {
-      const cellA = state.board[a.r][a.c];
-      const cellB = state.board[b.r][b.c];
-      if (!cellA || !cellB || !cellA.special || !cellB.special) return null;
-
-      const specials = [cellA.special, cellB.special];
-      const has = special => specials.includes(special);
-      const isStriped = special => special === "striped-h" || special === "striped-v";
-
-      if (has("color")) return colorSpecialComboGroup(a, b, cellA, cellB);
-
-      if (isStriped(cellA.special) && isStriped(cellB.special)) {
-        return {
-          cells: [a, b],
-          centers: [a, b],
-          orientation: "special",
-          type: cellA.type,
-          comboSpecial: "striped-striped",
-          forceMessage: "條紋糖連動：十字消除！"
-        };
-      }
-
-      if ((isStriped(cellA.special) && cellB.special === "wrapped") ||
-        (isStriped(cellB.special) && cellA.special === "wrapped")) {
-        return {
-          cells: [a, b],
-          centers: [a, b],
-          orientation: "special",
-          type: cellA.type,
-          comboSpecial: "striped-wrapped",
-          forceMessage: "條紋糖 + 包裝糖：三行三列消除！"
-        };
-      }
-
-      if (cellA.special === "wrapped" && cellB.special === "wrapped") {
-        return {
-          cells: [a, b],
-          centers: [a, b],
-          orientation: "special",
-          type: cellA.type,
-          comboSpecial: "wrapped-wrapped",
-          forceMessage: "包裝糖連動：大範圍爆炸！"
-        };
-      }
-
-      return null;
-    }
-
-    function colorSpecialComboGroup(a, b, cellA, cellB) {
-      const colorPos = cellA.special === "color" ? a : b;
-      const target = cellA.special === "color" ? cellB : cellA;
-
-      if (target.special === "color") {
-        const cells = [];
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) cells.push({ r, c });
+    function getConnectedGroup(start) {
+      const startCell = state.board[start.r][start.c];
+      if (!startCell) return [];
+      const target = startCell.type;
+      const seen = new Set([keyOf(start)]);
+      const queue = [start];
+      const group = [];
+      while (queue.length) {
+        const pos = queue.shift();
+        group.push(pos);
+        for (const next of [
+          { r: pos.r - 1, c: pos.c },
+          { r: pos.r + 1, c: pos.c },
+          { r: pos.r, c: pos.c - 1 },
+          { r: pos.r, c: pos.c + 1 }
+        ]) {
+          if (!inBounds(next.r, next.c)) continue;
+          const key = keyOf(next);
+          const cell = state.board[next.r][next.c];
+          if (seen.has(key) || !cell || cell.type !== target) continue;
+          seen.add(key);
+          queue.push(next);
         }
-        return {
-          cells,
-          orientation: "special",
-          type: target.type,
-          comboSpecial: "color-color",
-          forceMessage: "彩虹糖連動：全盤清除！"
-        };
       }
-
-      if (target.special === "striped-h" || target.special === "striped-v" || target.special === "wrapped") {
-        const cells = [colorPos];
-        const targets = [];
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) {
-            if (state.board[r][c] && state.board[r][c].type === target.type) {
-              const pos = { r, c };
-              cells.push(pos);
-              targets.push(pos);
-            }
-          }
-        }
-
-        return {
-          cells,
-          targets,
-          orientation: "special",
-          type: target.type,
-          comboSpecial: target.special === "wrapped" ? "color-wrapped" : "color-striped",
-          forceMessage: target.special === "wrapped"
-            ? "彩虹糖連動：同色糖全部爆開！"
-            : "彩虹糖連動：同色糖變成條紋糖後觸發！"
-        };
-      }
-
-      return null;
+      return group;
     }
 
-    async function trySwap(a, b) {
-      if (!state.inRound) {
-        playSound("invalid");
-        setToast("\u8acb\u5148\u9078\u64c7 Bet \u958b\u59cb\u65b0\u5c40\u3002");
-        return;
+    function findClickableGroups() {
+      const groups = [];
+      const visited = new Set();
+      for (let r = 0; r < size; r += 1) {
+        for (let c = 0; c < size; c += 1) {
+          const key = keyOf({ r, c });
+          if (visited.has(key) || !state.board[r][c]) continue;
+          const group = getConnectedGroup({ r, c });
+          for (const pos of group) visited.add(keyOf(pos));
+          if (group.length >= minGroup) groups.push(group);
+        }
       }
-      if (!spendBet()) return;
-      state.busy = true;
-      state.comboMultiplier = 1;
-      updateUI();
-      state.selected = null;
-      state.swapping = new Set([keyOf(a), keyOf(b)]);
-      swap(a, b);
-      render();
-      await wait(220);
-      state.swapping.clear();
+      groups.sort((a, b) => b.length - a.length);
+      return groups;
+    }
 
-      const specialSwap = specialSwapGroup(a, b);
-      if (specialSwap) {
-        await resolveMatches([specialSwap], []);
-        return;
-      }
+    function clearIdleHint() {
+      if (state.hintTimer) clearTimeout(state.hintTimer);
+      state.hintTimer = null;
+      state.hint = [];
+    }
 
-      const groups = findMatchGroups();
+    function resetIdleHint() {
+      clearIdleHint();
+      state.hintTimer = setTimeout(() => {
+        if (state.busy) return;
+        showHint();
+      }, 5200);
+    }
+
+    function showHint() {
+      const groups = findClickableGroups();
       if (!groups.length) {
-        const colorSwap = colorSwapGroup(a, b);
-        if (colorSwap) {
-          await resolveMatches([colorSwap], []);
-          return;
-        }
-
-        state.swapping = new Set([keyOf(a), keyOf(b)]);
-        swap(a, b);
-        render();
-        await wait(180);
-        state.swapping.clear();
-        state.busy = false;
-        render();
-        setToast("這組沒有消除，糖果彈回原位。");
+        setToast("目前沒有可消群組，下一次補牌會修正。");
         return;
       }
-
-      await resolveMatches(groups, [a, b]);
+      state.hint = groups[0];
+      setToast(`提示：這一團有 ${groups[0].length} 顆可以消。`);
+      render();
+      resetIdleHint();
     }
 
-    function colorSwapGroup(a, b) {
-      const cellA = state.board[a.r][a.c];
-      const cellB = state.board[b.r][b.c];
-      const colorPos = cellA && cellA.special === "color" ? a : cellB && cellB.special === "color" ? b : null;
-      const target = colorPos === a ? cellB : colorPos === b ? cellA : null;
-      if (!colorPos || !target) return null;
-
-      const cells = [colorPos];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (state.board[r][c] && state.board[r][c].type === target.type) cells.push({ r, c });
-        }
-      }
-
-      return { cells, orientation: "special", type: target.type, forceMessage: "彩虹糖清除同色糖！" };
+    function comboMultiplier() {
+      if (!state.combo) return 1;
+      return 1 + (state.combo * (state.combo + 1) * 0.05);
     }
 
-    function isAdjacent(a, b) {
-      return Math.abs(a.r - b.r) + Math.abs(a.c - b.c) === 1;
+    function scoreFor(count) {
+      return count * 10 + Math.max(0, count - 3) * 8;
     }
 
-    function colorSwapGroup(a, b) {
-      const cellA = state.board[a.r][a.c];
-      const cellB = state.board[b.r][b.c];
-      const colorPos = cellA && cellA.special === "color" ? a : cellB && cellB.special === "color" ? b : null;
-      const target = colorPos === a ? cellB : colorPos === b ? cellA : null;
-      if (!colorPos || !target) return null;
-
-      if (target.special === "color") {
-        const cells = [];
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) cells.push({ r, c });
-        }
-        return {
-          cells,
-          orientation: "special",
-          type: target.type,
-          comboSpecial: "color-color",
-          forceMessage: "彩虹糖連動：全盤清除！"
-        };
-      }
-
-      const cells = [colorPos];
-      const targets = [];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (state.board[r][c] && state.board[r][c].type === target.type) {
-            const pos = { r, c };
-            cells.push(pos);
-            targets.push(pos);
-          }
-        }
-      }
-
-      const comboSpecial = target.special === "striped-h" || target.special === "striped-v"
-        ? "color-striped"
-        : target.special === "wrapped"
-          ? "color-wrapped"
-          : "color-normal";
-
-      const messages = {
-        "color-normal": "彩虹糖清除同色糖！",
-        "color-striped": "彩虹糖連動：同色糖變成光束！",
-        "color-wrapped": "彩虹糖連動：同色糖全部爆開！"
-      };
-
+    function groupAnchor(group, clicked) {
+      if (clicked) return clicked;
+      const total = group.reduce((sum, pos) => ({ r: sum.r + pos.r, c: sum.c + pos.c }), { r: 0, c: 0 });
       return {
-        cells,
-        targets,
-        orientation: "special",
-        type: target.type,
-        comboSpecial,
-        forceMessage: messages[comboSpecial]
+        r: Math.round(total.r / group.length),
+        c: Math.round(total.c / group.length)
       };
-    }
-
-    function swap(a, b) {
-      const temp = state.board[a.r][a.c];
-      state.board[a.r][a.c] = state.board[b.r][b.c];
-      state.board[b.r][b.c] = temp;
-    }
-
-    async function resolveMatches(initialGroups, swapPair = []) {
-      try {
-        let groups = initialGroups;
-        let chain = 0;
-        const maxChains = 30;
-
-        while (groups.length && chain < maxChains) {
-          chain += 1;
-          const specialPlans = chooseCreatedSpecials(groups, swapPair);
-          const clearSet = expandClearSet(flattenGroups(groups), specialPlans, groups);
-          for (const [key, pos] of Array.from(clearSet.entries())) {
-            const cell = state.board[pos.r][pos.c];
-            if (cell && cell.special === "free") clearSet.delete(key);
-          }
-          const clearList = Array.from(clearSet, parseKey);
-          const visuals = collectSpecialVisuals(clearSet, specialPlans, groups);
-          const chargeVisuals = collectColorChargeVisuals(groups);
-
-          const baseGain = clearList.length * perCandyPayout();
-          const comboGain = chain > 1 ? 0.1 * (chain - 1) : 0;
-          state.score += baseGain;
-          state.comboMultiplier += comboGain;
-          state.totalScore += baseGain * state.comboMultiplier;
-          const jarResult = addJarProgress(clearList, groups, chain);
-          updateUI();
-          showScorePopups(clearList, baseGain, comboGain, jarResult);
-
-          if (chargeVisuals.size) {
-            state.effects = chargeVisuals;
-            render();
-            setToast("彩虹糖正在充能特殊糖果...");
-            playSound("special");
-            await wait(540);
-            state.effects.clear();
-          }
-
-          if (visuals.size) {
-            state.effects = visuals;
-            render();
-            setToast(describeSpecialVisuals(visuals));
-            playSound("special");
-            await wait(340);
-            state.effects.clear();
-          }
-
-          state.clearing = clearSet;
-          render();
-          setToast(chain === 1 ? describeSpecialPlan(specialPlans, groups) : `Combo ${chain - 1}！`);
-          playSound(chain === 1 ? "clear" : "combo");
-          await wait(280);
-          state.popups = [];
-
-          for (const pos of clearList) state.board[pos.r][pos.c] = null;
-          for (const specialPlan of specialPlans) {
-            state.board[specialPlan.pos.r][specialPlan.pos.c] = makeCell(specialPlan.type, specialPlan.special);
-          }
-          state.clearing.clear();
-
-          const moved = collapseBoard();
-          const filled = refillBoard();
-          state.settling = new Set(moved.map(keyOf));
-          state.entering = new Set(filled.map(keyOf));
-          updateUI();
-          render();
-          setToast("糖果下落，補牌完成。");
-          await wait(330);
-
-          state.settling.clear();
-          state.entering.clear();
-          render();
-          await wait(80);
-          groups = findMatchGroups();
-          swapPair = [];
-        }
-
-        if (chain >= maxChains && findMatchGroups().length) setToast("Combo 已結算，下一步仍可繼續消除。");
-      } catch (error) {
-        console.error(error);
-        setToast("流程已重置，可以繼續玩。");
-      } finally {
-        state.busy = false;
-        state.selected = null;
-        state.hint = [];
-        clearEffects();
-        ensurePlayableBoard();
-        saveBetState();
-        updateUI();
-        render();
-        resetIdleHint();
-      }
-    }
-
-    function flattenGroups(groups) {
-      const map = new Map();
-      for (const group of groups) {
-        for (const pos of group.cells) map.set(keyOf(pos), pos);
-      }
-      return Array.from(map.values());
-    }
-
-    function showScorePopups(clearList, baseGain, comboGain, jarResult = null) {
-      if (!clearList.length) return;
-      const center = clearList.reduce((sum, pos) => ({
-        r: sum.r + pos.r,
-        c: sum.c + pos.c
-      }), { r: 0, c: 0 });
-      const r = center.r / clearList.length;
-      const c = center.c / clearList.length;
-
-      state.popups = [
-        { r, c, text: `+${formatScore(baseGain)}`, kind: "score" }
-      ];
-      if (comboGain > 0) {
-        state.popups.push({
-          r: Math.max(0, r - 0.55),
-          c: Math.min(size - 1, c + 0.55),
-          text: `Combo +x${comboGain.toFixed(2)}`,
-          kind: "combo"
-        });
-      }
-      if (jarResult && jarResult.points > 0) {
-        state.popups.push({
-          r: Math.min(size - 1, r + 0.65),
-          c: Math.max(0, c - 0.45),
-          text: jarResult.completed ? `\u7cd6\u7f50 +${money(jarResult.reward)}` : `\u7cd6\u7f50 +${jarResult.points}`,
-          kind: "combo"
-        });
-      }
-    }
-
-    function jarTarget() {
-      return 70 + (state.jar.level - 1) * 10;
-    }
-
-    function jarReward() {
-      return Number((state.bet * (1.5 + Math.min(state.jar.level - 1, 8) * 0.15)).toFixed(1));
-    }
-
-    function addJarProgress(clearList, groups, chain) {
-      const specialBonus = groups.reduce((sum, group) => {
-        if (group.comboSpecial) return sum + 10;
-        if (group.special || group.forceMessage) return sum + 6;
-        return sum;
-      }, 0);
-      const comboBonus = chain > 1 ? chain * 3 : 0;
-      let points = clearList.length + specialBonus + comboBonus;
-      let completed = false;
-      let reward = 0;
-
-      while (points > 0) {
-        const target = jarTarget();
-        const need = target - state.jar.progress;
-        const used = Math.min(points, need);
-        state.jar.progress += used;
-        points -= used;
-
-        if (state.jar.progress >= target) {
-          completed = true;
-          const earned = jarReward();
-          reward += earned;
-          state.totalScore += earned;
-          state.jar.level += 1;
-          state.jar.progress = 0;
-        }
-      }
-
-      if (completed) {
-        state.jar.justCompleted = true;
-        playSound("combo");
-        setTimeout(() => {
-          setToast(`\u7cd6\u7f50\u6eff\u4e86\uff0c\u4efb\u52d9\u734e\u52f5 +${money(reward)}\uff01`);
-        }, 40);
-        setTimeout(() => {
-          state.jar.justCompleted = false;
-          updateUI();
-        }, 850);
-      }
-
-      return {
-        points: clearList.length + specialBonus + comboBonus,
-        completed,
-        reward
-      };
-    }
-
-    function chooseCreatedSpecials(groups, swapPair) {
-      const candidates = [];
-      const horizontal = groups.filter(group => group.orientation === "h");
-      const vertical = groups.filter(group => group.orientation === "v");
-
-      for (const h of horizontal) {
-        for (const v of vertical) {
-          const cross = h.cells.find(a => v.cells.some(b => a.r === b.r && a.c === b.c));
-          if (cross) {
-            candidates.push({ pos: cross, type: h.type, special: "wrapped", rank: 3 });
-          }
-        }
-      }
-
-      for (const group of groups) {
-        if (group.orientation === "special") continue;
-        if (group.cells.length >= 5) {
-          candidates.push({ pos: pickSpecialPosition(group, swapPair), type: group.type, special: "color", rank: 4 });
-        } else if (group.cells.length === 4) {
-          candidates.push({
-            pos: pickSpecialPosition(group, swapPair),
-            type: group.type,
-            special: group.orientation === "h" ? "striped-h" : "striped-v",
-            rank: 2
-          });
-        }
-      }
-
-      const byPosition = new Map();
-      candidates.sort((a, b) => b.rank - a.rank);
-      for (const candidate of candidates) {
-        const key = keyOf(candidate.pos);
-        if (!byPosition.has(key)) byPosition.set(key, candidate);
-      }
-      return Array.from(byPosition.values());
-    }
-
-    function pickSpecialPosition(group, swapPair) {
-      for (const swapped of swapPair) {
-        const hit = group.cells.find(pos => pos.r === swapped.r && pos.c === swapped.c);
-        if (hit) return hit;
-      }
-      return group.cells[Math.floor(group.cells.length / 2)];
-    }
-
-    function describeSpecialPlan(plans = [], groups = []) {
-      const forced = groups.find(group => group.forceMessage);
-      if (forced) return forced.forceMessage;
-      const plan = plans[0];
-      if (plans.length > 1) return `做出 ${plans.length} 顆特殊糖！`;
-      if (!plan) return "糖果消除中...";
-      if (plan.special === "striped-h" || plan.special === "striped-v") return "4 顆連線，做出條紋糖！";
-      if (plan.special === "wrapped") return "T/L 形消除，做出包裝糖！";
-      if (plan.special === "color") return "5 顆直線，做出彩虹糖！";
-      return "糖果消除中...";
-    }
-
-    function expandClearSet(baseMatches, specialPlans = [], groups = []) {
-      const clear = new Map();
-      for (const pos of baseMatches) {
-        const cell = state.board[pos.r][pos.c];
-        if (cell && cell.special === "color" && !isColorComboPosition(pos, groups)) continue;
-        clear.set(keyOf(pos), pos);
-      }
-      for (const specialPlan of specialPlans) clear.delete(keyOf(specialPlan.pos));
-      applyColorComboClear(clear, groups);
-      applySpecialComboClear(clear, groups);
-
-      let changed = true;
-      while (changed) {
-        changed = false;
-        for (const pos of Array.from(clear.values())) {
-          const cell = state.board[pos.r][pos.c];
-          if (!cell || !cell.special) continue;
-          if (cell.special === "color") continue;
-          const before = clear.size;
-          addSpecialEffect(clear, pos, cell);
-          if (clear.size > before) changed = true;
-        }
-      }
-
-      return new Set(clear.keys());
-    }
-
-    function isColorComboPosition(pos, groups) {
-      return groups.some(group =>
-        group.comboSpecial && group.cells.some(cellPos => cellPos.r === pos.r && cellPos.c === pos.c)
-      );
-    }
-
-    function applyColorComboClear(clear, groups) {
-      const combo = groups.find(group => group.comboSpecial);
-      if (!combo) return;
-
-      if (combo.comboSpecial === "color-color") {
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) clear.set(`${r},${c}`, { r, c });
-        }
-      } else if (combo.comboSpecial === "color-striped") {
-        combo.targets.forEach((pos, index) => {
-          if (index % 2 === 0) {
-            for (let c = 0; c < size; c += 1) clear.set(`${pos.r},${c}`, { r: pos.r, c });
-          } else {
-            for (let r = 0; r < size; r += 1) clear.set(`${r},${pos.c}`, { r, c: pos.c });
-          }
-        });
-      } else if (combo.comboSpecial === "color-wrapped") {
-        for (const pos of combo.targets) {
-          for (let dr = -1; dr <= 1; dr += 1) {
-            for (let dc = -1; dc <= 1; dc += 1) {
-              const r = pos.r + dr;
-              const c = pos.c + dc;
-              if (inBounds(r, c)) clear.set(`${r},${c}`, { r, c });
-            }
-          }
-        }
-      }
-    }
-
-    function applySpecialComboClear(clear, groups) {
-      const combo = groups.find(group => group.comboSpecial);
-      if (!combo) return;
-
-      if (combo.comboSpecial === "striped-striped") {
-        const center = combo.centers[0];
-        for (let c = 0; c < size; c += 1) clear.set(`${center.r},${c}`, { r: center.r, c });
-        for (let r = 0; r < size; r += 1) clear.set(`${r},${center.c}`, { r, c: center.c });
-      } else if (combo.comboSpecial === "striped-wrapped") {
-        const center = combo.centers[0];
-        for (let dr = -1; dr <= 1; dr += 1) {
-          const row = center.r + dr;
-          if (row >= 0 && row < size) {
-            for (let c = 0; c < size; c += 1) clear.set(`${row},${c}`, { r: row, c });
-          }
-        }
-        for (let dc = -1; dc <= 1; dc += 1) {
-          const col = center.c + dc;
-          if (col >= 0 && col < size) {
-            for (let r = 0; r < size; r += 1) clear.set(`${r},${col}`, { r, c: col });
-          }
-        }
-      } else if (combo.comboSpecial === "wrapped-wrapped") {
-        for (const center of combo.centers) {
-          for (let dr = -2; dr <= 2; dr += 1) {
-            for (let dc = -2; dc <= 2; dc += 1) {
-              const r = center.r + dr;
-              const c = center.c + dc;
-              if (inBounds(r, c)) clear.set(`${r},${c}`, { r, c });
-            }
-          }
-        }
-      }
-    }
-
-    function collectSpecialVisuals(clearSet, specialPlans = [], groups = []) {
-      const visuals = new Map();
-      applyColorComboVisuals(visuals, clearSet, groups);
-      applySpecialComboVisuals(visuals, clearSet, groups);
-
-      for (const key of clearSet) {
-        const pos = parseKey(key);
-        const cell = state.board[pos.r][pos.c];
-        if (!cell || !cell.special) continue;
-
-        if (cell.special === "striped-h") {
-          for (let c = 0; c < size; c += 1) visuals.set(`${pos.r},${c}`, "blast-h");
-        } else if (cell.special === "striped-v") {
-          for (let r = 0; r < size; r += 1) visuals.set(`${r},${pos.c}`, "blast-v");
-        } else if (cell.special === "wrapped") {
-          for (let dr = -1; dr <= 1; dr += 1) {
-            for (let dc = -1; dc <= 1; dc += 1) {
-              const r = pos.r + dr;
-              const c = pos.c + dc;
-              if (inBounds(r, c)) visuals.set(`${r},${c}`, "blast-burst");
-            }
-          }
-        } else if (cell.special === "color") {
-          for (const clearKey of clearSet) visuals.set(clearKey, "blast-color");
-        }
-      }
-
-      return visuals;
-    }
-
-    function collectColorChargeVisuals(groups = []) {
-      const combo = groups.find(group => group.comboSpecial && group.comboSpecial.startsWith("color-"));
-      const visuals = new Map();
-      if (!combo || combo.comboSpecial === "color-normal") return visuals;
-
-      if (combo.comboSpecial === "color-color") {
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) visuals.set(`${r},${c}`, "color-charge");
-        }
-      } else {
-        for (const pos of combo.targets || []) visuals.set(keyOf(pos), "color-charge");
-      }
-      return visuals;
-    }
-
-    function applyColorComboVisuals(visuals, clearSet, groups) {
-      const combo = groups.find(group => group.comboSpecial);
-      if (!combo) return;
-
-      if (combo.comboSpecial === "color-color") {
-        for (const key of clearSet) visuals.set(key, "blast-color");
-      } else if (combo.comboSpecial === "color-striped") {
-        combo.targets.forEach((pos, index) => {
-          if (index % 2 === 0) {
-            for (let c = 0; c < size; c += 1) visuals.set(`${pos.r},${c}`, "blast-h");
-          } else {
-            for (let r = 0; r < size; r += 1) visuals.set(`${r},${pos.c}`, "blast-v");
-          }
-        });
-      } else if (combo.comboSpecial === "color-wrapped") {
-        for (const pos of combo.targets) {
-          for (let dr = -1; dr <= 1; dr += 1) {
-            for (let dc = -1; dc <= 1; dc += 1) {
-              const r = pos.r + dr;
-              const c = pos.c + dc;
-              if (inBounds(r, c)) visuals.set(`${r},${c}`, "blast-burst");
-            }
-          }
-        }
-      }
-    }
-
-    function applySpecialComboVisuals(visuals, clearSet, groups) {
-      const combo = groups.find(group => group.comboSpecial);
-      if (!combo) return;
-
-      if (combo.comboSpecial === "striped-striped") {
-        const center = combo.centers[0];
-        for (let c = 0; c < size; c += 1) visuals.set(`${center.r},${c}`, "blast-h");
-        for (let r = 0; r < size; r += 1) visuals.set(`${r},${center.c}`, "blast-v");
-      } else if (combo.comboSpecial === "striped-wrapped") {
-        const center = combo.centers[0];
-        for (let dr = -1; dr <= 1; dr += 1) {
-          const row = center.r + dr;
-          if (row >= 0 && row < size) {
-            for (let c = 0; c < size; c += 1) visuals.set(`${row},${c}`, "blast-h");
-          }
-        }
-        for (let dc = -1; dc <= 1; dc += 1) {
-          const col = center.c + dc;
-          if (col >= 0 && col < size) {
-            for (let r = 0; r < size; r += 1) visuals.set(`${r},${col}`, "blast-v");
-          }
-        }
-      } else if (combo.comboSpecial === "wrapped-wrapped") {
-        for (const center of combo.centers) {
-          for (let dr = -2; dr <= 2; dr += 1) {
-            for (let dc = -2; dc <= 2; dc += 1) {
-              const r = center.r + dr;
-              const c = center.c + dc;
-              if (inBounds(r, c)) visuals.set(`${r},${c}`, "blast-burst");
-            }
-          }
-        }
-      }
-    }
-
-    function describeSpecialVisuals(visuals) {
-      const classes = new Set(visuals.values());
-      if (classes.has("blast-color")) return "彩虹糖掃描同色糖！";
-      if (classes.has("blast-burst")) return "包裝糖爆開！";
-      if (classes.has("blast-h") || classes.has("blast-v")) return "條紋糖發射光束！";
-      return "特殊糖果發動！";
-    }
-
-    function addSpecialEffect(clear, pos, cell) {
-      if (cell.special === "striped-h") {
-        for (let c = 0; c < size; c += 1) clear.set(`${pos.r},${c}`, { r: pos.r, c });
-      } else if (cell.special === "striped-v") {
-        for (let r = 0; r < size; r += 1) clear.set(`${r},${pos.c}`, { r, c: pos.c });
-      } else if (cell.special === "wrapped") {
-        for (let dr = -1; dr <= 1; dr += 1) {
-          for (let dc = -1; dc <= 1; dc += 1) {
-            const r = pos.r + dr;
-            const c = pos.c + dc;
-            if (inBounds(r, c)) clear.set(`${r},${c}`, { r, c });
-          }
-        }
-      } else if (cell.special === "color") {
-        const targetType = firstNormalMatchedType(clear, cell.type);
-        for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) {
-            if (state.board[r][c] && state.board[r][c].type === targetType) clear.set(`${r},${c}`, { r, c });
-          }
-        }
-      }
-    }
-
-    function firstNormalMatchedType(clear, fallback) {
-      for (const pos of clear.values()) {
-        const cell = state.board[pos.r][pos.c];
-        if (cell && !cell.special) return cell.type;
-      }
-      return fallback;
     }
 
     function collapseBoard() {
       const moved = [];
       for (let c = 0; c < size; c += 1) {
-        const column = [];
+        const stack = [];
         for (let r = size - 1; r >= 0; r -= 1) {
-          if (state.board[r][c]) column.push({ cell: state.board[r][c], from: r });
+          if (state.board[r][c]) stack.push(state.board[r][c]);
         }
         for (let r = size - 1; r >= 0; r -= 1) {
-          const item = column[size - 1 - r] || null;
-          state.board[r][c] = item ? item.cell : null;
-          if (item && item.from !== r) moved.push({ r, c });
+          const next = stack[size - 1 - r] || null;
+          if (state.board[r][c] !== next && next) moved.push({ r, c });
+          state.board[r][c] = next;
         }
       }
       return moved;
     }
 
     function refillBoard() {
-      const filled = [];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (!state.board[r][c]) {
-            state.board[r][c] = makeCell(safeCandyType(r, c));
-            filled.push({ r, c });
-          }
-        }
-      }
-      return filled;
-    }
-
-    function safeCandyType(r, c) {
-      const blocked = new Set();
-      if (c >= 2 && state.board[r][c - 1] && state.board[r][c - 2] &&
-        state.board[r][c - 1].type === state.board[r][c - 2].type) blocked.add(state.board[r][c - 1].type);
-      if (r >= 2 && state.board[r - 1][c] && state.board[r - 2][c] &&
-        state.board[r - 1][c].type === state.board[r - 2][c].type) blocked.add(state.board[r - 1][c].type);
-      if (r <= size - 3 && state.board[r + 1][c] && state.board[r + 2][c] &&
-        state.board[r + 1][c].type === state.board[r + 2][c].type) blocked.add(state.board[r + 1][c].type);
-
-      const options = [];
-      for (let type = 0; type < candyTypes; type += 1) {
-        if (!blocked.has(type)) options.push(type);
-      }
-      return options[Math.floor(Math.random() * options.length)];
-    }
-
-    function findMatches() {
-      return flattenGroups(findMatchGroups());
-    }
-
-    function findMatchGroups() {
-      const groups = [];
-      for (let r = 0; r < size; r += 1) {
-        let run = [{ r, c: 0 }];
-        for (let c = 1; c < size; c += 1) {
-          if (sameMatchType(state.board[r][c], state.board[r][c - 1])) run.push({ r, c });
-          else {
-            addGroup(groups, run, "h");
-            run = [{ r, c }];
-          }
-        }
-        addGroup(groups, run, "h");
-      }
-
-      for (let c = 0; c < size; c += 1) {
-        let run = [{ r: 0, c }];
-        for (let r = 1; r < size; r += 1) {
-          if (sameMatchType(state.board[r][c], state.board[r - 1][c])) run.push({ r, c });
-          else {
-            addGroup(groups, run, "v");
-            run = [{ r, c }];
-          }
-        }
-        addGroup(groups, run, "v");
-      }
-      return groups;
-    }
-
-    function sameMatchType(a, b) {
-      return a && b && a.special !== "color" && b.special !== "color" && a.type === b.type;
-    }
-
-    function addGroup(groups, run, orientation) {
-      if (run.length < 3) return;
-      const first = state.board[run[0].r][run[0].c];
-      groups.push({ cells: run.slice(), orientation, type: first.type });
-    }
-
-    function removeStartingMatches() {
-      let matches = findMatches();
-      let guard = 0;
-      while (matches.length && guard < 80) {
-        for (const pos of matches) {
-          state.board[pos.r][pos.c] = makeCell(safeCandyType(pos.r, pos.c));
-        }
-        matches = findMatches();
-        guard += 1;
-      }
-    }
-
-    function findValidMove() {
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          const a = { r, c };
-          const candidates = [{ r: r + 1, c }, { r, c: c + 1 }];
-          for (const b of candidates) {
-            if (!inBounds(b.r, b.c)) continue;
-            swap(a, b);
-            const works = findMatchGroups().length > 0;
-            swap(a, b);
-            if (works) return [a, b];
-          }
-        }
-      }
-      return null;
-    }
-
-    function ensurePlayableBoard() {
-      let guard = 0;
-      while (!findValidMove() && guard < 100) {
-        createGuaranteedMove();
-        removeStartingMatches();
-        guard += 1;
-      }
-    }
-
-    function createGuaranteedMove() {
-      const row = Math.floor(Math.random() * size);
-      const col = Math.floor(Math.random() * (size - 3));
-      const type = randomCandy();
-      const decoy = (type + 1 + Math.floor(Math.random() * (candyTypes - 1))) % candyTypes;
-
-      state.board[row][col] = makeCell(type);
-      state.board[row][col + 1] = makeCell(type);
-      state.board[row][col + 2] = makeCell(decoy);
-      state.board[row][col + 3] = makeCell(type);
-    }
-
-    function showHint() {
-      if (!state.inRound) return;
-      if (state.busy) return;
-      clearIdleHint();
-      const move = findValidMove();
-      if (!move) {
-        createGuaranteedMove();
-        removeStartingMatches();
-        state.hint = [];
-        render();
-        setToast("已產生新的可消除機會。");
-        return;
-      }
-      state.selected = null;
-      state.hint = move;
-      render();
-      setToast("黃色框框這兩顆可以交換。");
-      resetIdleHint();
-    }
-
-    function resetIdleHint() {
-      if (!state.inRound) return;
-      if (state.idleTimer) clearTimeout(state.idleTimer);
-      state.idleTimer = setTimeout(() => {
-        if (state.busy || state.selected) {
-          resetIdleHint();
-          return;
-        }
-        const move = findValidMove();
-        if (!move) return;
-        state.hint = move;
-        render();
-        setToast("提示：黃色框框這兩顆可以交換。");
-      }, 5000);
-    }
-
-    function clearIdleHint() {
-      if (state.idleTimer) clearTimeout(state.idleTimer);
-      state.hint = [];
-    }
-
-    function updateUI() {
-      const target = jarTarget();
-      const jarPercent = Math.max(0, Math.min(100, (state.jar.progress / target) * 100));
-      els.app.classList.toggle("in-round", state.inRound);
-      els.balance.textContent = money(state.balance);
-      els.menuBalance.textContent = money(state.balance);
-      els.bet.textContent = money(state.bet);
-      els.menuBet.textContent = money(state.bet);
-      els.score.textContent = formatScore(state.score);
-      els.multiplier.textContent = `x${state.comboMultiplier.toFixed(2)}`;
-      els.total.textContent = formatScore(state.totalScore);
-      els.jarLevel.parentElement.firstChild.nodeValue = "\u7cd6\u7f50\u4efb\u52d9 Lv.";
-      els.jarLevel.textContent = state.jar.level;
-      els.jarText.textContent = `${state.jar.progress} / ${target}`;
-      els.jarReward.textContent = `\u6eff\u7f50 +${money(jarReward())}`;
-      els.jarBar.style.setProperty("--jar-width", `${jarPercent}%`);
-      els.jarFill.style.setProperty("--jar-fill", `${Math.max(8, jarPercent)}%`);
-      els.jarPanel.classList.toggle("ready", state.jar.justCompleted);
-      const canAfford = state.balance >= state.bet;
-      els.claim.disabled = !state.inRound || state.freeMode || finalScore() <= 0 || state.busy;
-      els.chooseBet.disabled = !state.inRound || state.busy || state.freeMode;
-      els.startGame.disabled = state.inRound || state.busy || !canAfford;
-      els.menuBetDown.disabled = state.inRound || state.busy || state.bet <= 5;
-      els.menuBetUp.disabled = state.inRound || state.busy || state.bet >= 100 || state.bet + 5 > state.balance;
-      els.betDown.disabled = true;
-      els.betUp.disabled = true;
-    }
-
-    function claim() {
-      if (finalScore() <= 0 || state.busy) {
-        playSound("invalid");
-        setToast("先完成至少一次消除，才可以收下糖幣。");
-        return;
-      }
-      const win = finalScore();
-      state.balance += win;
-      state.score = 0;
-      state.totalScore = 0;
-      state.comboMultiplier = 1;
-      saveBetState();
-      updateUI();
-      playSound("claim");
-      setToast(`收下 ${money(win)} 糖幣，繼續目前盤面。`);
-      resetIdleHint();
-    }
-
-    function spendBet() {
-      if (state.balance < state.bet) {
-        playSound("invalid");
-        setToast("餘額不足，請降低 Bet 或收下糖幣。");
-        return false;
-      }
-      state.balance -= state.bet;
-      updateUI();
-      return true;
-    }
-
-    function changeBet(delta) {
-      if (state.busy) {
-        playSound("invalid");
-        setToast("請等糖果消除完成後再切換 Bet。");
-        return;
-      }
-      saveBetState();
-      const previousBet = state.bet;
-      state.bet = Math.max(5, Math.min(100, state.bet + delta));
-      if (state.bet > state.balance && state.balance >= 5) state.bet = Math.floor(state.balance / 5) * 5;
-      if (state.bet === previousBet) {
-        updateUI();
-        return;
-      }
-      loadBetState(state.bet);
-      setToast(`切換到 ${money(state.bet)} Bet 盤面。`);
-    }
-
-    function money(value) {
-      return `$${Number(value).toFixed(1)}`;
-    }
-
-    function finalScore() {
-      return Number(state.totalScore.toFixed(1));
-    }
-
-    function perCandyPayout() {
-      return state.bet * 0.18;
-    }
-
-    function formatScore(value) {
-      return Number(value).toFixed(1);
-    }
-
-    const candyNames = ["\u7d05\u8272", "\u7da0\u8272", "\u9ec3\u8272", "\u85cd\u8272", "\u6a58\u8272", "\u7d2b\u8272"];
-    const missionSlots = ["common", "common", "medium", "jackpot"];
-
-    function resetAllMissions() {
-      state.missions = missionSlots.map(tier => createMission(tier));
-    }
-
-    function createMission(tier) {
-      state.missionSerial += 1;
-      const color = Math.floor(Math.random() * candyTypes);
-      const common = [
-        () => ({
-          type: "color",
-          color,
-          target: 10,
-          reward: { kind: "bonus", value: 0.5 },
-          text: `\u6d88\u53bb 10 \u9846${candyNames[color]}\u7cd6`
-        }),
-        () => ({
-          type: "special",
-          special: "striped",
-          target: 2,
-          reward: { kind: "bonus", value: 0.8 },
-          text: "\u89f8\u767c 2 \u6b21\u689d\u7d0b\u7cd6"
-        }),
-        () => ({
-          type: "singleClear",
-          target: 10,
-          reward: { kind: "percent", value: 0.1 },
-          text: "\u55ae\u6b21\u6d88\u53bb 10 \u9846\u4ee5\u4e0a"
-        })
-      ];
-      const medium = [
-        () => ({
-          type: "color",
-          color,
-          target: 24,
-          reward: { kind: "bonus", value: 2 },
-          text: `\u6d88\u53bb 24 \u9846${candyNames[color]}\u7cd6`
-        }),
-        () => ({
-          type: "special",
-          special: "wrapped",
-          target: 2,
-          reward: { kind: "percent", value: 0.18 },
-          text: "\u89f8\u767c 2 \u6b21\u5305\u88dd\u7cd6"
-        }),
-        () => ({
-          type: "combo",
-          target: 3,
-          reward: { kind: "percent", value: 0.2 },
-          text: "\u9054\u6210 3 \u6ce2 Combo"
-        })
-      ];
-      const jackpot = [
-        () => ({
-          type: "combo",
-          target: 5,
-          reward: { kind: "multiplier", value: 2 },
-          text: "\u9054\u6210 5 \u6ce2 Combo"
-        }),
-        () => ({
-          type: "colorCombo",
-          target: 1,
-          reward: { kind: "multiplier", value: 2.5 },
-          text: "\u89f8\u767c\u5f69\u8679\u7cd6\u9023\u52d5"
-        }),
-        () => ({
-          type: "color",
-          color,
-          target: 60,
-          reward: { kind: "multiplier", value: 3 },
-          text: `\u6d88\u53bb 60 \u9846${candyNames[color]}\u7cd6`
-        })
-      ];
-      const pool = tier === "jackpot" ? jackpot : tier === "medium" ? medium : common;
-      const mission = pool[Math.floor(Math.random() * pool.length)]();
-      return {
-        id: `${tier}-${state.missionSerial}`,
-        tier,
-        progress: 0,
-        ...mission
-      };
-    }
-
-    function rewardText(reward) {
-      if (reward.kind === "bonus") return `+${money(state.bet * reward.value)}`;
-      if (reward.kind === "percent") return `Total +${Math.round(reward.value * 100)}%`;
-      return `Total x${reward.value}`;
-    }
-
-    function renderMissions() {
-      if (!state.missions.length) resetAllMissions();
-      els.missionGrid.innerHTML = "";
-      for (const mission of state.missions) {
-        const card = document.createElement("div");
-        card.className = `mission-card ${mission.tier === "jackpot" ? "jackpot" : ""}`;
-        const pct = Math.max(0, Math.min(100, (mission.progress / mission.target) * 100));
-        card.innerHTML = `
-          <div class="mission-name">${mission.tier === "jackpot" ? "Jackpot - " : ""}${mission.text}</div>
-          <div class="mission-progress"><div class="mission-fill" style="--mission-fill:${pct}%"></div></div>
-          <div class="mission-reward">${Math.min(mission.progress, mission.target)} / ${mission.target} · ${rewardText(mission.reward)}</div>
-        `;
-        els.missionGrid.appendChild(card);
-      }
-    }
-
-    function collectClearStats(clearList, groups, chain) {
-      const colors = Array.from({ length: candyTypes }, () => 0);
-      const countedSpecials = new Set();
-      let scoringCount = 0;
-      let striped = 0;
-      let wrapped = 0;
-      let colorSpecial = 0;
-      let colorCombo = 0;
-      let specialCombo = 0;
-      for (const pos of clearList) {
-        const cell = state.board[pos.r][pos.c];
-        if (!cell || cell.special === "free") continue;
-        scoringCount += 1;
-        colors[cell.type] += 1;
-        const specialKey = keyOf(pos);
-        if (cell.special === "striped-h" || cell.special === "striped-v") {
-          striped += 1;
-          countedSpecials.add(specialKey);
-        }
-        if (cell.special === "wrapped") {
-          wrapped += 1;
-          countedSpecials.add(specialKey);
-        }
-        if (cell.special === "color") {
-          colorSpecial += 1;
-          countedSpecials.add(specialKey);
-        }
-      }
-      for (const group of groups) {
-        if (group.comboSpecial && group.comboSpecial.startsWith("color-")) colorCombo += 1;
-        if (group.comboSpecial && group.comboSpecial !== "color-normal") specialCombo += 1;
-        for (const pos of group.cells || []) {
-          const cell = state.board[pos.r][pos.c];
-          const specialKey = keyOf(pos);
-          if (!cell || cell.special === "free" || countedSpecials.has(specialKey)) continue;
-          if (cell.special === "striped-h" || cell.special === "striped-v") {
-            striped += 1;
-            countedSpecials.add(specialKey);
-          } else if (cell.special === "wrapped") {
-            wrapped += 1;
-            countedSpecials.add(specialKey);
-          } else if (cell.special === "color") {
-            colorSpecial += 1;
-            countedSpecials.add(specialKey);
-          }
-        }
-      }
-      return { colors, scoringCount, striped, wrapped, colorSpecial, colorCombo, specialCombo, comboWaves: Math.max(0, chain - 1) };
-    }
-
-    function updateMissionProgress(stats) {
-      if (state.freeMode) return [];
-      if (!state.missions.length) resetAllMissions();
-      const completed = [];
-      for (const mission of state.missions) {
-        let gain = 0;
-        if (mission.type === "color") gain = stats.colors[mission.color] || 0;
-        if (mission.type === "special" && mission.special === "striped") gain = stats.striped;
-        if (mission.type === "special" && mission.special === "wrapped") gain = stats.wrapped;
-        if (mission.type === "special" && mission.special === "color") gain = stats.colorSpecial;
-        if (mission.type === "singleClear" && stats.scoringCount >= mission.target) gain = mission.target;
-        if (mission.type === "combo") gain = stats.comboWaves;
-        if (mission.type === "colorCombo") gain = stats.colorCombo;
-        if (mission.type === "specialCombo") gain = stats.specialCombo;
-        if (!gain) continue;
-        mission.progress = Math.min(mission.target, mission.progress + gain);
-        if (mission.progress >= mission.target) completed.push(mission);
-      }
-      const rewards = [];
-      for (const mission of completed) {
-        rewards.push(applyMissionReward(mission));
-        const index = state.missions.findIndex(item => item.id === mission.id);
-        if (index >= 0) state.missions[index] = createMission(mission.tier);
-      }
-      return rewards;
-    }
-
-    function applyMissionReward(mission) {
-      const reward = mission.reward;
-      let text = "";
-      if (reward.kind === "bonus") {
-        const amount = state.bet * reward.value;
-        state.totalScore += amount;
-        text = `${mission.tier === "jackpot" ? "Jackpot" : "\u4efb\u52d9"} +${money(amount)}`;
-      } else if (reward.kind === "percent") {
-        const amount = Math.max(state.totalScore, state.bet) * reward.value;
-        state.totalScore += amount;
-        text = `${mission.tier === "jackpot" ? "Jackpot" : "\u4efb\u52d9"} +${Math.round(reward.value * 100)}%`;
-      } else {
-        state.winMultiplier *= reward.value;
-        text = `Jackpot x${reward.value}`;
-      }
-      playSound(mission.tier === "jackpot" ? "combo" : "claim");
-      return text;
-    }
-
-    function showMissionPopups(clearList, rewards) {
-      if (!rewards.length) return;
-      const anchor = clearList[0] || { r: 3, c: 3 };
-      rewards.forEach((text, index) => {
-        state.popups.push({
-          r: Math.max(0, anchor.r - 0.45 - index * 0.35),
-          c: Math.min(size - 1, anchor.c + 0.45),
-          text,
-          kind: "combo"
-        });
-      });
-      setToast(rewards.join(" / "));
-    }
-
-    function finalScore() {
-      return Number((state.totalScore * state.winMultiplier).toFixed(1));
-    }
-
-    function sameMatchType(a, b) {
-      return a && b &&
-        a.special !== "color" && b.special !== "color" &&
-        a.special !== "free" && b.special !== "free" &&
-        a.type === b.type;
-    }
-
-    function colorSwapGroup(a, b) {
-      const cellA = state.board[a.r][a.c];
-      const cellB = state.board[b.r][b.c];
-      const colorPos = cellA && cellA.special === "color" ? a : cellB && cellB.special === "color" ? b : null;
-      const target = colorPos === a ? cellB : colorPos === b ? cellA : null;
-      if (!colorPos || !target || target.special === "free") return null;
-
-      if (target.special === "color") {
-        const cells = [];
+      let filled = [];
+      const snapshot = state.board.map(row => row.slice());
+      for (let attempt = 0; attempt < 80; attempt += 1) {
+        state.board = snapshot.map(row => row.slice());
+        filled = [];
         for (let r = 0; r < size; r += 1) {
-          for (let c = 0; c < size; c += 1) cells.push({ r, c });
-        }
-        return {
-          cells,
-          orientation: "special",
-          type: target.type,
-          comboSpecial: "color-color",
-          forceMessage: "\u5f69\u8679\u7cd6\u4e92\u649e\uff1a\u5168\u76e4\u6e05\u9664\uff01"
-        };
-      }
-
-      const cells = [colorPos];
-      const targets = [];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (state.board[r][c] && state.board[r][c].type === target.type && state.board[r][c].special !== "free") {
-            const pos = { r, c };
-            cells.push(pos);
-            targets.push(pos);
+          for (let c = 0; c < size; c += 1) {
+            if (!state.board[r][c]) {
+              state.board[r][c] = makeCell();
+              filled.push({ r, c });
+            }
           }
         }
+        if (findClickableGroups().length) return filled;
       }
 
-      const comboSpecial = target.special === "striped-h" || target.special === "striped-v"
-        ? "color-striped"
-        : target.special === "wrapped"
-          ? "color-wrapped"
-          : "color-normal";
-
-      const messages = {
-        "color-normal": "\u5f69\u8679\u7cd6\u6e05\u9664\u540c\u8272\u7cd6\uff01",
-        "color-striped": "\u5f69\u8679\u7cd6\u9023\u52d5\uff1a\u540c\u8272\u7cd6\u5168\u90e8\u8b8a\u689d\u7d0b\uff01",
-        "color-wrapped": "\u5f69\u8679\u7cd6\u9023\u52d5\uff1a\u540c\u8272\u7cd6\u5168\u90e8\u7206\u958b\uff01"
-      };
-
-      return {
-        cells,
-        targets,
-        orientation: "special",
-        type: target.type,
-        comboSpecial,
-        forceMessage: messages[comboSpecial]
-      };
-    }
-
-    function updateUI() {
-      const freeCount = countFreeCandies();
-      els.app.classList.toggle("in-round", state.inRound);
-      els.balance.textContent = money(state.balance);
-      els.menuBalance.textContent = money(state.balance);
-      els.bet.textContent = money(state.bet);
-      els.menuBet.textContent = money(state.bet);
-      els.score.textContent = formatScore(state.score);
-      els.multiplier.textContent = `x${state.comboMultiplier.toFixed(2)}`;
-      els.total.textContent = formatScore(finalScore());
-      els.missionBonus.textContent = `Win x${state.winMultiplier.toFixed(2)}`;
-      els.freeStatus.textContent = state.freeMoves > 0
-        ? `Free \u6a21\u5f0f\uff1a${state.freeMoves} \u6b65`
-        : `Free \u7cd6\u679c ${Math.min(freeCount, 3)}/3`;
-      renderMissions();
-      const canAfford = state.balance >= state.bet;
-      els.claim.disabled = !state.inRound || state.freeMode || finalScore() <= 0 || state.busy;
-      els.chooseBet.disabled = !state.inRound || state.busy || state.freeMode;
-      els.startGame.disabled = state.inRound || state.busy || !canAfford;
-      els.menuBetDown.disabled = state.inRound || state.busy || state.bet <= 5;
-      els.menuBetUp.disabled = state.inRound || state.busy || state.bet >= 100 || state.bet + 5 > state.balance;
-      els.betDown.disabled = true;
-      els.betUp.disabled = true;
-    }
-
-    function saveBetState() {
-      if (!state.board.length) return;
-      state.betStates.set(state.bet, {
-        board: cloneBoard(state.board),
-        score: state.score,
-        totalScore: state.totalScore,
-        comboMultiplier: state.comboMultiplier,
-        winMultiplier: state.winMultiplier,
-        freeMoves: state.freeMoves,
-        freeMode: state.freeMode,
-        mainBoardSnapshot: state.mainBoardSnapshot ? cloneBoard(state.mainBoardSnapshot) : null
-      });
-    }
-
-    function loadBetState(bet) {
-      const saved = state.betStates.get(bet);
-      state.selected = null;
-      state.dragStart = null;
-      state.hint = [];
-      clearEffects();
-      if (saved) {
-        state.board = cloneBoard(saved.board);
-        state.score = saved.score;
-        state.totalScore = saved.totalScore;
-        state.comboMultiplier = saved.comboMultiplier;
-        state.winMultiplier = saved.winMultiplier || 1;
-        state.freeMoves = saved.freeMoves || 0;
-        state.freeMode = Boolean(saved.freeMode);
-        state.mainBoardSnapshot = saved.mainBoardSnapshot ? cloneBoard(saved.mainBoardSnapshot) : null;
-        document.body.classList.toggle("free-stage", state.freeMode);
-      } else {
-        state.score = 0;
-        state.totalScore = 0;
-        state.comboMultiplier = 1;
-        state.winMultiplier = 1;
-        state.freeMoves = 0;
-        state.freeMode = false;
-        state.mainBoardSnapshot = null;
-        document.body.classList.remove("free-stage");
-        createFreshBoard();
-      }
-      updateUI();
-      render();
-      resetIdleHint();
-    }
-
-    function createFreshBoard() {
-      let guard = 0;
-      do {
-        state.board = Array.from({ length: size }, () =>
-          Array.from({ length: size }, () => makeCell(randomCandy()))
-        );
-        removeStartingMatches();
-        guard += 1;
-      } while (!findValidMove() && guard < 80);
-      if (!findValidMove()) seedPlayablePatternAnyBoard();
-    }
-
-    function ensurePlayableBoard() {
-      return Boolean(findMatchGroups().length || findValidMove());
-    }
-
-    function spendBet() {
-      if (!state.inRound) {
-        playSound("invalid");
-        setToast("\u8acb\u5148\u9078\u64c7 Bet \u958b\u59cb\u65b0\u5c40\u3002");
-        return false;
-      }
-      if (state.freeMoves > 0) {
-        state.freeMoves -= 1;
-        state.freeMode = true;
-        updateUI();
-        setToast(state.freeMoves > 0 ? `Free \u79fb\u52d5\uff0c\u5269 ${state.freeMoves} \u6b65\u3002` : "Free \u79fb\u52d5\u7528\u5b8c\uff0c\u672c\u6b21\u7d50\u7b97\u5f8c\u8fd4\u56de\u539f\u76e4\u3002");
-        return true;
-      }
-      if (state.balance < state.bet) {
-        playSound("invalid");
-        setToast("\u9918\u984d\u4e0d\u8db3\uff0c\u8acb\u6536\u4e0b\u6216\u91cd\u9078 Bet\u3002");
-        return false;
-      }
-      state.balance -= state.bet;
-      updateUI();
-      return true;
-    }
-
-    function refillBoard() {
-      const filled = [];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (!state.board[r][c]) filled.push({ r, c });
-        }
-      }
-      if (!filled.length) return filled;
-
-      const snapshot = cloneBoard(state.board);
-      for (let attempt = 0; attempt < 140; attempt += 1) {
-        for (const pos of filled) state.board[pos.r][pos.c] = generateRefillCell(pos.r, pos.c);
-        if (findMatchGroups().length || findValidMove()) return filled;
-        for (const pos of filled) state.board[pos.r][pos.c] = null;
-      }
-
-      state.board = cloneBoard(snapshot);
-      for (const pos of filled) state.board[pos.r][pos.c] = generateRefillCell(pos.r, pos.c, false);
-      seedPlayablePatternInFilled(filled);
+      if (forcePlayableWithNewCells(filled)) return filled;
       return filled;
     }
 
-    function generateRefillCell(r, c, allowFree = true) {
-      if (allowFree && !state.freeMode && !state.suppressFreeSpawn && Math.random() < 0.03) return makeCell(randomCandy(), "free");
-      const type = safeCandyType(r, c);
-      if (state.freeMoves > 0) {
-        const roll = Math.random();
-        if (roll < 0.1) return makeCell(type, "wrapped");
-        if (roll < 0.28) return makeCell(type, Math.random() < 0.5 ? "striped-h" : "striped-v");
-      }
-      return makeCell(type);
-    }
-
-    function seedPlayablePatternInFilled(filled) {
-      const byRow = new Map();
+    function forcePlayableWithNewCells(filled) {
+      const filledKeys = new Set(filled.map(keyOf));
       for (const pos of filled) {
-        if (!byRow.has(pos.r)) byRow.set(pos.r, []);
-        byRow.get(pos.r).push(pos.c);
+        const original = state.board[pos.r][pos.c];
+        for (let type = 0; type < candyTypes; type += 1) {
+          state.board[pos.r][pos.c] = makeCell(type);
+          if (findClickableGroups().length) return true;
+        }
+        state.board[pos.r][pos.c] = original;
       }
-      for (const [r, cols] of byRow) {
-        cols.sort((a, b) => a - b);
-        for (let i = 0; i <= cols.length - 4; i += 1) {
-          if (cols[i + 3] - cols[i] !== 3) continue;
-          const type = safeCandyType(r, cols[i]);
-          const decoy = (type + 1 + Math.floor(Math.random() * (candyTypes - 1))) % candyTypes;
-          state.board[r][cols[i]] = makeCell(type);
-          state.board[r][cols[i + 1]] = makeCell(type);
-          state.board[r][cols[i + 2]] = makeCell(decoy);
-          state.board[r][cols[i + 3]] = makeCell(type);
+
+      for (const pos of filled) {
+        const shapes = [
+          [pos, { r: pos.r, c: pos.c + 1 }, { r: pos.r, c: pos.c + 2 }],
+          [pos, { r: pos.r + 1, c: pos.c }, { r: pos.r + 2, c: pos.c }]
+        ];
+        for (const shape of shapes) {
+          if (!shape.every(p => inBounds(p.r, p.c) && filledKeys.has(keyOf(p)))) continue;
+          const type = randomCandy();
+          for (const p of shape) state.board[p.r][p.c] = makeCell(type);
           return true;
         }
       }
       return false;
     }
 
-    function seedPlayablePatternAnyBoard() {
-      const row = Math.floor(Math.random() * size);
-      const col = Math.floor(Math.random() * (size - 3));
-      const type = randomCandy();
-      const decoy = (type + 1 + Math.floor(Math.random() * (candyTypes - 1))) % candyTypes;
-      state.board[row][col] = makeCell(type);
-      state.board[row][col + 1] = makeCell(type);
-      state.board[row][col + 2] = makeCell(decoy);
-      state.board[row][col + 3] = makeCell(type);
+    function showScorePopup(anchor, gain, combo) {
+      state.popups.push({
+        r: Math.max(0, anchor.r - 0.2),
+        c: Math.min(size - 1, anchor.c + 0.15),
+        text: combo > 0 ? `+${gain}  x${comboMultiplier().toFixed(1)}` : `+${gain}`,
+        combo: combo > 0
+      });
     }
 
-    function countFreeCandies() {
-      let count = 0;
-      if (!state.board.length) return count;
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (state.board[r][c] && state.board[r][c].special === "free") count += 1;
-        }
-      }
-      return count;
-    }
+    async function clearGroup(group, clicked) {
+      state.busy = true;
+      clearIdleHint();
+      const now = Date.now();
+      state.combo = now - state.lastClearAt <= comboWindow ? state.combo + 1 : 0;
+      state.lastClearAt = now;
 
-    function showFreeTransition(text) {
-      els.freeTransition.textContent = text;
-      els.freeTransition.classList.remove("show");
-      void els.freeTransition.offsetWidth;
-      els.freeTransition.classList.add("show");
-    }
-
-    function createFreeBoard() {
-      let guard = 0;
-      do {
-        state.board = Array.from({ length: size }, () =>
-          Array.from({ length: size }, () => generateFreeBoardCell())
-        );
-        removeStartingMatches();
-        guard += 1;
-      } while (!findValidMove() && guard < 80);
-      if (!findValidMove()) seedPlayablePatternAnyBoard();
-    }
-
-    function generateFreeBoardCell() {
-      const type = randomCandy();
-      const roll = Math.random();
-      if (roll < 0.14) return makeCell(type, "wrapped");
-      if (roll < 0.38) return makeCell(type, Math.random() < 0.5 ? "striped-h" : "striped-v");
-      return makeCell(type);
-    }
-
-    async function enterFreeStage() {
-      state.mainBoardSnapshot = cloneBoard(state.board);
-      showFreeTransition("FREE MODE");
-      playSound("combo");
-      await wait(620);
-      state.freeMoves = 5;
-      state.freeMode = true;
-      document.body.classList.add("free-stage");
-      stopMusic();
-      startMusic();
-      createFreeBoard();
+      const anchor = groupAnchor(group, clicked);
+      const base = scoreFor(group.length);
+      const gain = Math.round(base * comboMultiplier());
+      state.score += gain;
+      state.clearing = new Set(group.map(keyOf));
+      showScorePopup(anchor, gain, state.combo);
       updateUI();
       render();
-      setToast("Free \u6a21\u5f0f\u958b\u59cb\uff1a5 \u6b65\u4e0d\u6263 Bet\uff01");
-      await wait(720);
-    }
+      setToast(state.combo ? `Combo ${state.combo}！消去 ${group.length} 顆糖果。` : `消去 ${group.length} 顆糖果！`);
+      playSound(state.combo ? "combo" : "clear");
+      await wait(340);
 
-    async function exitFreeStage() {
-      if (!state.freeMode || state.returningFromFree) return;
-      state.returningFromFree = true;
-      showFreeTransition("RETURN");
-      playSound("claim");
-      await wait(620);
-      state.freeMode = false;
-      state.freeMoves = 0;
-      document.body.classList.remove("free-stage");
-      if (state.mainBoardSnapshot) state.board = cloneBoard(state.mainBoardSnapshot);
-      state.mainBoardSnapshot = null;
-      stopMusic();
-      startMusic();
-      clearEffects();
-      updateUI();
-      render();
-      setToast("Free \u7d50\u675f\uff0c\u56de\u5230\u539f\u672c\u76e4\u9762\u3002");
-      await wait(500);
-      state.returningFromFree = false;
-    }
+      for (const pos of group) state.board[pos.r][pos.c] = null;
+      state.clearing.clear();
+      state.popups = [];
 
-    function createMission(tier) {
-      state.missionSerial += 1;
-      const color = Math.floor(Math.random() * candyTypes);
-      const common = [
-        () => ({
-          type: "color",
-          color,
-          target: 10,
-          reward: { kind: "bonus", value: 0.5 },
-          text: `\u6d88\u53bb 10 \u9846${candyNames[color]}\u7cd6`
-        }),
-        () => ({
-          type: "special",
-          special: "striped",
-          target: 2,
-          reward: { kind: "bonus", value: 0.8 },
-          text: "\u89f8\u767c 2 \u6b21\u689d\u7d0b\u7cd6"
-        }),
-        () => ({
-          type: "special",
-          special: "color",
-          target: 1,
-          reward: { kind: "percent", value: 0.1 },
-          text: "\u89f8\u767c 1 \u6b21\u5f69\u8679\u7cd6"
-        })
-      ];
-      const medium = [
-        () => ({
-          type: "color",
-          color,
-          target: 24,
-          reward: { kind: "bonus", value: 2 },
-          text: `\u6d88\u53bb 24 \u9846${candyNames[color]}\u7cd6`
-        }),
-        () => ({
-          type: "special",
-          special: "wrapped",
-          target: 2,
-          reward: { kind: "percent", value: 0.18 },
-          text: "\u89f8\u767c 2 \u6b21\u5305\u88dd\u7cd6"
-        }),
-        () => ({
-          type: "combo",
-          target: 3,
-          reward: { kind: "percent", value: 0.2 },
-          text: "\u9054\u6210 3 \u6ce2 Combo"
-        })
-      ];
-      const jackpot = [
-        () => ({
-          type: "specialCombo",
-          target: 2,
-          reward: { kind: "multiplier", value: 2 },
-          text: "\u89f8\u767c 2 \u6b21\u7279\u6b8a\u7cd6\u9023\u52d5"
-        }),
-        () => ({
-          type: "colorCombo",
-          target: 1,
-          reward: { kind: "multiplier", value: 2.5 },
-          text: "\u89f8\u767c\u5f69\u8679\u7cd6\u9023\u52d5"
-        }),
-        () => ({
-          type: "special",
-          special: "wrapped",
-          target: 4,
-          reward: { kind: "multiplier", value: 3 },
-          text: "\u89f8\u767c 4 \u6b21\u5305\u88dd\u7cd6"
-        })
-      ];
-      const pool = tier === "jackpot" ? jackpot : tier === "medium" ? medium : common;
-      const mission = pool[Math.floor(Math.random() * pool.length)]();
-      return {
-        id: `${tier}-${state.missionSerial}`,
-        tier,
-        progress: 0,
-        ...mission
-      };
-    }
-
-    async function triggerFreeCandyModeIfReady() {
-      if (state.freeCollecting || countFreeCandies() < 3) return false;
-      state.freeCollecting = true;
-      const freePositions = [];
-      for (let r = 0; r < size; r += 1) {
-        for (let c = 0; c < size; c += 1) {
-          if (state.board[r][c] && state.board[r][c].special === "free") freePositions.push({ r, c });
-        }
-      }
-      state.effects = new Map(freePositions.map(pos => [keyOf(pos), "free-collect"]));
-      render();
-      playSound("combo");
-      setToast("Free \u7cd6\u679c\u96c6\u6eff\uff0c\u5373\u5c07\u9032\u5165 Free \u6a21\u5f0f\uff01");
-      await wait(820);
-      for (const pos of freePositions) state.board[pos.r][pos.c] = null;
-      state.effects.clear();
       const moved = collapseBoard();
-      state.suppressFreeSpawn = true;
       const filled = refillBoard();
-      state.suppressFreeSpawn = false;
       state.settling = new Set(moved.map(keyOf));
       state.entering = new Set(filled.map(keyOf));
-      updateUI();
       render();
-      await wait(300);
+      await wait(360);
+
       state.settling.clear();
       state.entering.clear();
-      await enterFreeStage();
-      state.freeCollecting = false;
+      state.hint = [];
+      state.busy = false;
       updateUI();
       render();
-      return true;
-    }
-
-    async function resolveMatches(initialGroups, swapPair = []) {
-      try {
-        let groups = initialGroups;
-        let chain = 0;
-        const maxChains = 30;
-
-        while (groups.length && chain < maxChains) {
-          chain += 1;
-          const specialPlans = chooseCreatedSpecials(groups, swapPair);
-          const clearSet = expandClearSet(flattenGroups(groups), specialPlans, groups);
-          for (const key of Array.from(clearSet)) {
-            const pos = parseKey(key);
-            const cell = state.board[pos.r][pos.c];
-            if (cell && cell.special === "free") clearSet.delete(key);
-          }
-          const clearList = Array.from(clearSet, parseKey);
-          const scoringList = clearList.filter(pos => {
-            const cell = state.board[pos.r][pos.c];
-            return cell && cell.special !== "free";
-          });
-          const visuals = collectSpecialVisuals(clearSet, specialPlans, groups);
-          const chargeVisuals = collectColorChargeVisuals(groups);
-          const stats = collectClearStats(clearList, groups, chain);
-
-          const baseGain = scoringList.length * perCandyPayout();
-          const comboGain = chain > 1 ? 0.1 * (chain - 1) : 0;
-          state.score += baseGain;
-          state.comboMultiplier += comboGain;
-          state.totalScore += baseGain * state.comboMultiplier;
-          const missionRewards = state.freeMode ? [] : updateMissionProgress(stats);
-          updateUI();
-          showScorePopups(scoringList.length ? scoringList : clearList, baseGain, comboGain, null);
-          showMissionPopups(scoringList.length ? scoringList : clearList, missionRewards);
-
-          if (chargeVisuals.size) {
-            state.effects = chargeVisuals;
-            render();
-            setToast("\u5f69\u8679\u7cd6\u6b63\u5728\u84c4\u529b...");
-            playSound("special");
-            await wait(760);
-            state.effects.clear();
-          }
-
-          if (visuals.size) {
-            state.effects = visuals;
-            render();
-            setToast(describeSpecialVisuals(visuals));
-            playSound("special");
-            await wait(640);
-            state.effects.clear();
-          }
-
-          state.clearing = clearSet;
-          render();
-          setToast(chain === 1 ? describeSpecialPlan(specialPlans, groups) : `Combo ${chain - 1}\uff01`);
-          playSound(chain === 1 ? "clear" : "combo");
-          await wait(360);
-          state.popups = [];
-
-          for (const pos of clearList) state.board[pos.r][pos.c] = null;
-          for (const specialPlan of specialPlans) {
-            state.board[specialPlan.pos.r][specialPlan.pos.c] = makeCell(specialPlan.type, specialPlan.special);
-          }
-          state.clearing.clear();
-
-          const moved = collapseBoard();
-          const filled = refillBoard();
-          state.settling = new Set(moved.map(keyOf));
-          state.entering = new Set(filled.map(keyOf));
-          updateUI();
-          render();
-          setToast("\u7cd6\u679c\u88dc\u4e0a\u4f86\u4e86\uff01");
-          await wait(330);
-
-          state.settling.clear();
-          state.entering.clear();
-          render();
-          await wait(80);
-          groups = findMatchGroups();
-          swapPair = [];
-        }
-
-        if (chain >= maxChains && findMatchGroups().length) setToast("Combo \u592a\u9577\uff0c\u5148\u5e6b\u4f60\u505c\u5728\u7a69\u5b9a\u72c0\u614b\u3002");
-        if (state.freeMode && state.freeMoves <= 0) {
-          await exitFreeStage();
-        } else {
-          const triggeredFree = await triggerFreeCandyModeIfReady();
-          if (triggeredFree) {
-          const followUpGroups = findMatchGroups();
-          if (followUpGroups.length) await resolveMatches(followUpGroups, []);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        setToast("\u76e4\u9762\u7d50\u7b97\u6642\u51fa\u73fe\u554f\u984c\u3002");
-      } finally {
-        state.busy = false;
-        state.selected = null;
-        state.hint = [];
-        clearEffects();
-        ensurePlayableBoard();
-        saveBetState();
-        updateUI();
-        render();
-        resetIdleHint();
-      }
-    }
-
-    function startRound() {
-      if (state.busy || state.inRound) return;
-      if (state.balance < state.bet) {
-        playSound("invalid");
-        setToast("\u9918\u984d\u4e0d\u8db3\uff0c\u8acb\u8abf\u4f4e Bet\u3002");
-        updateUI();
-        return;
-      }
-      state.inRound = true;
-      loadBetState(state.bet);
-      playSound("select");
-      setToast(`Bet ${money(state.bet)} \u5df2\u9396\u5b9a\uff0c\u958b\u59cb\u672c\u5c40\u3002`);
-    }
-
-    function returnToBetScreen() {
-      saveBetState();
-      state.inRound = false;
-      state.selected = null;
-      state.dragStart = null;
-      state.hint = [];
-      clearEffects();
-      clearIdleHint();
-      updateUI();
-    }
-
-    function chooseBetScreen() {
-      if (!state.inRound || state.busy) {
-        playSound("invalid");
-        return;
-      }
-      returnToBetScreen();
-      playSound("select");
-      setToast("\u5df2\u4fdd\u7559\u76ee\u524d\u76e4\u9762\uff0c\u8acb\u9078\u64c7 Bet\u3002");
-    }
-
-    function claim() {
-      if (state.freeMode) {
-        playSound("invalid");
-        setToast("Free \u6a21\u5f0f\u4e2d\u4e0d\u80fd\u6536\u4e0b\u7cd6\u5e63\uff0c\u7d50\u675f\u5f8c\u6703\u56de\u5230\u4e3b\u76e4\u9762\u3002");
-        return;
-      }
-      if (!state.inRound || finalScore() <= 0 || state.busy) {
-        playSound("invalid");
-        setToast("\u9084\u6c92\u6709\u53ef\u4ee5\u6536\u4e0b\u7684\u7cd6\u5e63\u3002");
-        return;
-      }
-      const win = finalScore();
-      state.balance += win;
-      state.score = 0;
-      state.totalScore = 0;
-      state.comboMultiplier = 1;
-      state.winMultiplier = 1;
-      state.freeMoves = 0;
-      state.freeMode = false;
-      if (state.mainBoardSnapshot) state.board = cloneBoard(state.mainBoardSnapshot);
-      state.mainBoardSnapshot = null;
-      document.body.classList.remove("free-stage");
-      stopMusic();
-      startMusic();
-      resetAllMissions();
-      saveBetState();
-      updateUI();
-      playSound("claim");
-      setToast(`\u6536\u4e0b ${money(win)} \u7cd6\u5e63\uff0c\u4efb\u52d9\u5df2\u5237\u65b0\uff0c\u76e4\u9762\u5df2\u4fdd\u7559\u3002`);
       resetIdleHint();
     }
 
-    function changeBet(delta) {
-      if (state.inRound || state.busy) {
+    async function handleClick(pos) {
+      if (state.busy) return;
+      startAudio();
+      const group = getConnectedGroup(pos);
+      if (group.length < minGroup) {
+        state.invalid = new Set(group.map(keyOf));
+        state.hint = [];
+        render();
+        setToast("要 3 顆以上相連才可以消去。");
         playSound("invalid");
-        setToast("\u672c\u5c40 Bet \u5df2\u9396\u5b9a\uff0c\u6536\u4e0b\u7cd6\u5e63\u5f8c\u624d\u80fd\u91cd\u65b0\u9078\u64c7\u3002");
+        await wait(280);
+        state.invalid.clear();
+        render();
+        resetIdleHint();
         return;
       }
-      const previousBet = state.bet;
-      state.bet = Math.max(5, Math.min(100, state.bet + delta));
-      if (state.bet > state.balance && state.balance >= 5) state.bet = Math.floor(state.balance / 5) * 5;
-      if (state.balance < 5) state.bet = 5;
-      updateUI();
-      if (state.bet !== previousBet) playSound("select");
+      await clearGroup(group, pos);
     }
 
-    function setToast(text) {
-      els.toast.textContent = text;
-    }
+    els.board.addEventListener("click", event => {
+      const cell = event.target.closest(".cell");
+      if (!cell || !els.board.contains(cell)) return;
+      handleClick({ r: Number(cell.dataset.r), c: Number(cell.dataset.c) });
+    });
 
-    function inBounds(r, c) {
-      return r >= 0 && c >= 0 && r < size && c < size;
-    }
-
-    function wait(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
+    els.hint.addEventListener("click", () => {
+      startAudio();
+      showHint();
+    });
 
     function startAudio() {
       if (state.audio) {
         if (state.audio.state === "suspended") state.audio.resume();
         return state.audio;
       }
-
       const AudioContextClass = globalThis.AudioContext || globalThis.webkitAudioContext;
       if (!AudioContextClass) return null;
       state.audio = new AudioContextClass();
@@ -3557,45 +716,15 @@
       return state.audio;
     }
 
-    function playSound(kind) {
-      const audio = startAudio();
-      if (!audio) return;
-
-      const now = audio.currentTime;
-      if (kind === "select") {
-        tone(740, 0.055, 0.045, "triangle", now);
-      } else if (kind === "invalid") {
-        tone(180, 0.09, 0.05, "sawtooth", now);
-      } else if (kind === "clear") {
-        tone(520, 0.07, 0.06, "sine", now);
-        tone(780, 0.08, 0.045, "triangle", now + 0.045);
-      } else if (kind === "combo") {
-        tone(660, 0.075, 0.075, "triangle", now);
-        tone(880, 0.085, 0.072, "triangle", now + 0.05);
-        tone(1175, 0.095, 0.066, "triangle", now + 0.1);
-        tone(1760, 0.13, 0.045, "sine", now + 0.16);
-        tone(2349, 0.08, 0.028, "sine", now + 0.22);
-      } else if (kind === "special") {
-        tone(392, 0.12, 0.045, "sine", now);
-        tone(784, 0.16, 0.05, "triangle", now + 0.04);
-        tone(1568, 0.18, 0.035, "sine", now + 0.09);
-      } else if (kind === "claim") {
-        tone(523, 0.08, 0.055, "triangle", now);
-        tone(659, 0.08, 0.055, "triangle", now + 0.07);
-        tone(784, 0.12, 0.06, "triangle", now + 0.14);
-      }
-    }
-
     function tone(freq, duration, volume, type, startTime) {
       const audio = state.audio;
       if (!audio) return;
-
       const osc = audio.createOscillator();
       const gain = audio.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, startTime);
       const attack = Math.min(0.055, duration * 0.38);
-      const release = Math.min(0.11, duration * 0.55);
+      const release = Math.min(0.12, duration * 0.58);
       const releaseStart = Math.max(startTime + attack + 0.012, startTime + duration - release);
       gain.gain.setValueAtTime(0, startTime);
       gain.gain.linearRampToValueAtTime(volume, startTime + attack);
@@ -3607,32 +736,31 @@
       osc.stop(startTime + duration + 0.08);
     }
 
-    function chord(freqs, duration, volume, type, startTime) {
-      for (const freq of freqs) tone(freq, duration, volume / freqs.length, type, startTime);
+    function playSound(kind) {
+      const audio = startAudio();
+      if (!audio) return;
+      const now = audio.currentTime;
+      if (kind === "invalid") {
+        tone(180, 0.14, 0.04, "sine", now);
+      } else if (kind === "clear") {
+        tone(520, 0.16, 0.05, "sine", now);
+        tone(760, 0.2, 0.04, "sine", now + 0.06);
+      } else if (kind === "combo") {
+        tone(620, 0.16, 0.055, "sine", now);
+        tone(820, 0.19, 0.052, "sine", now + 0.06);
+        tone(1040, 0.24, 0.042, "sine", now + 0.14);
+      }
     }
 
-    function stopMusic() {
-      if (state.musicTimer) clearInterval(state.musicTimer);
-      state.musicTimer = null;
-    }
-
-    function sugarTick(startTime, volume = 0.018) {
-      return;
-    }
-
-    function softPad(freqs, startTime, duration = 1.35) {
+    function softPad(freqs, startTime, duration = 1.55) {
       for (const freq of freqs) {
-        tone(freq, duration, 0.018, "sine", startTime);
-        tone(freq * 2.01, duration * 0.82, 0.006, "triangle", startTime + 0.04);
+        tone(freq, duration, 0.014, "sine", startTime);
+        tone(freq * 2, duration * 0.8, 0.004, "sine", startTime + 0.05);
       }
     }
 
     function startMusic() {
       if (state.musicTimer || !state.audio) return;
-      if (state.freeMode) {
-        startFreeMusic();
-        return;
-      }
       const chords = [
         [262, 330, 392, 523],
         [220, 277, 330, 440],
@@ -3640,82 +768,27 @@
         [196, 247, 294, 392]
       ];
       const bass = [131, 110, 147, 98];
-      const lead = [
-        659, 0, 784, 880, 0, 784, 659, 523,
-        587, 0, 659, 784, 0, 880, 784, 659,
-        698, 0, 880, 988, 0, 880, 784, 587,
-        659, 0, 784, 659, 0, 587, 523, 0
-      ];
-      const arp = [
-        523, 659, 784, 1047,
-        440, 554, 659, 880,
-        587, 740, 880, 1175,
-        392, 494, 587, 784
-      ];
       let bar = 0;
-      const playMusicBar = () => {
+      const playBar = () => {
         if (!state.audio || state.audio.state === "suspended") return;
-        const now = state.audio.currentTime + 0.035;
-        const chordIndex = bar % chords.length;
-        softPad(chords[chordIndex], now, 1.55);
-        tone(bass[chordIndex], 1.2, 0.026, "triangle", now + 0.02);
-
-        for (let i = 0; i < 8; i += 1) {
-          const t = now + i * 0.18;
-          const arpNote = arp[(bar * 4 + i) % arp.length];
-          if (i % 2 === 0) tone(arpNote, 0.22, 0.009, "sine", t);
-
-          const leadNote = lead[(bar * 8 + i) % lead.length];
-          if (leadNote && (i === 2 || i === 3 || i === 6)) {
-            tone(leadNote, 0.34, 0.02, "sine", t + 0.025);
-          }
-        }
+        const now = state.audio.currentTime + 0.04;
+        const index = bar % chords.length;
+        softPad(chords[index], now, 1.7);
+        tone(bass[index], 1.32, 0.018, "sine", now + 0.02);
+        if (bar % 2 === 0) tone(chords[index][3], 0.46, 0.012, "sine", now + 0.54);
         bar += 1;
       };
-      playMusicBar();
-      state.musicTimer = setInterval(playMusicBar, 1440);
+      playBar();
+      state.musicTimer = setInterval(playBar, 1520);
     }
 
-    function startFreeMusic() {
-      if (state.musicTimer || !state.audio) return;
-      const pads = [
-        [196, 247, 294, 392],
-        [220, 277, 330, 440],
-        [262, 330, 392, 523],
-        [247, 311, 370, 494]
-      ];
-      const sparkle = [784, 988, 1175, 1568, 1397, 1175, 988, 880];
-      let step = 0;
-      const playFreeBar = () => {
-        if (!state.audio || state.audio.state === "suspended") return;
-        const now = state.audio.currentTime + 0.03;
-        const pad = pads[step % pads.length];
-        softPad(pad, now, 1.75);
-        tone(pad[0] / 2, 1.3, 0.022, "sine", now + 0.02);
-        for (let i = 0; i < 8; i += 1) {
-          const t = now + i * 0.16;
-          const note = sparkle[(step * 3 + i) % sparkle.length];
-          if (i % 2 === 0) tone(note, 0.24, 0.013, "sine", t);
-          if (i === 3 || i === 7) {
-            tone(note * 0.75, 0.3, 0.01, "sine", t + 0.045);
-          }
-        }
-        step += 1;
-      };
-      playFreeBar();
-      state.musicTimer = setInterval(playFreeBar, 1280);
-    }
+    document.addEventListener("gesturestart", event => event.preventDefault());
+    document.addEventListener("dblclick", event => event.preventDefault(), { passive: false });
 
-    els.claim.addEventListener("click", claim);
-    els.chooseBet.addEventListener("click", chooseBetScreen);
-    els.betDown.addEventListener("click", () => changeBet(-5));
-    els.betUp.addEventListener("click", () => changeBet(5));
-    els.menuBetDown.addEventListener("click", () => changeBet(-5));
-    els.menuBetUp.addEventListener("click", () => changeBet(5));
-    els.startGame.addEventListener("click", startRound);
-    els.hint.addEventListener("click", showHint);
+    createBoard();
     updateUI();
-    setToast("\u8acb\u5148\u9078\u64c7 Bet \u958b\u59cb\u65b0\u5c40\u3002");
+    render();
+    resetIdleHint();
   </script>
 </body>
 </html>
