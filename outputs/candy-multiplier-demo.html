@@ -170,8 +170,8 @@
 
     .candy {
       position: relative;
-      width: 88%;
-      height: 88%;
+      width: 86%;
+      height: 86%;
       border-radius: 50%;
       filter: drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22));
       transform-origin: center;
@@ -181,8 +181,8 @@
     .candy::before {
       content: "";
       position: absolute;
-      inset: 9% 12% 45% 18%;
-      border-radius: 50%;
+      inset: 10% 13% 46% 17%;
+      border-radius: inherit;
       background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.1));
       transform: rotate(-18deg);
       mix-blend-mode: screen;
@@ -191,43 +191,77 @@
     .candy::after {
       content: "";
       position: absolute;
-      inset: 15%;
+      inset: 12%;
       border-radius: inherit;
       background:
-        radial-gradient(circle at 38% 32%, rgba(255,255,255,0.9) 0 8%, transparent 9%),
-        radial-gradient(circle at 68% 78%, rgba(0,0,0,0.14) 0 20%, transparent 21%);
-      opacity: 0.72;
+        radial-gradient(circle at 38% 32%, rgba(255,255,255,0.86) 0 7%, transparent 8%),
+        radial-gradient(circle at 70% 80%, rgba(0,0,0,0.16) 0 18%, transparent 19%);
+      opacity: 0.68;
     }
 
     .type-0 {
-      border-radius: 50% 46% 52% 48%;
-      background: radial-gradient(circle at 32% 24%, #ff8aab 0 12%, #f01864 34%, #a9003c 100%);
+      width: 90%;
+      height: 72%;
+      border-radius: 48% 52% 46% 54% / 64% 66% 34% 36%;
+      background:
+        radial-gradient(circle at 28% 22%, rgba(255,255,255,0.92) 0 9%, transparent 10%),
+        linear-gradient(135deg, #ff72a0 0 18%, #f21861 42%, #a9003c 100%);
+      box-shadow: inset -8px -9px 0 rgba(95, 0, 48, 0.18), inset 8px 7px 0 rgba(255,255,255,0.2);
     }
 
     .type-1 {
-      border-radius: 42% 58% 45% 55%;
-      background: radial-gradient(circle at 34% 24%, #ffd179 0 13%, #ff8c1a 38%, #b84a00 100%);
+      width: 74%;
+      height: 90%;
+      border-radius: 46% 54% 48% 52% / 58% 62% 38% 42%;
+      background:
+        repeating-linear-gradient(35deg, rgba(255,255,255,0.28) 0 5px, transparent 5px 13px),
+        radial-gradient(circle at 35% 20%, #ffd584 0 12%, #ff8b18 42%, #b44700 100%);
+      box-shadow: inset -7px -10px 0 rgba(91, 32, 0, 0.2), inset 7px 8px 0 rgba(255,255,255,0.2);
     }
 
     .type-2 {
-      border-radius: 52% 48% 42% 58%;
-      background: radial-gradient(circle at 32% 24%, #8cf4ff 0 12%, #00a8ff 38%, #005fba 100%);
+      width: 86%;
+      height: 86%;
+      border-radius: 26%;
+      transform: rotate(45deg);
+      background:
+        linear-gradient(90deg, transparent 0 37%, rgba(255,255,255,0.34) 38% 48%, transparent 49% 100%),
+        radial-gradient(circle at 28% 20%, #91fbff 0 11%, #00a8ff 40%, #0059b9 100%);
+      box-shadow: inset -8px -8px 0 rgba(0, 50, 116, 0.22), inset 7px 7px 0 rgba(255,255,255,0.18);
     }
 
     .type-3 {
-      border-radius: 46% 54% 56% 44%;
-      background: radial-gradient(circle at 34% 24%, #b7ff70 0 12%, #24c73b 38%, #087b2c 100%);
+      width: 88%;
+      height: 68%;
+      border-radius: 999px;
+      background:
+        radial-gradient(circle at 28% 26%, rgba(255,255,255,0.88) 0 9%, transparent 10%),
+        linear-gradient(160deg, #b8ff65 0 18%, #24c83d 46%, #08782d 100%);
+      box-shadow: inset -10px -7px 0 rgba(0, 80, 30, 0.2), inset 9px 6px 0 rgba(255,255,255,0.18);
     }
 
     .type-4 {
-      border-radius: 55% 45% 52% 48%;
-      background: radial-gradient(circle at 32% 24%, #d1a0ff 0 13%, #8b35ff 38%, #4410b8 100%);
+      width: 82%;
+      height: 82%;
+      border-radius: 32% 68% 35% 65% / 62% 36% 64% 38%;
+      background:
+        radial-gradient(circle at 28% 20%, #e2bcff 0 13%, transparent 14%),
+        conic-gradient(from 40deg, #5613c6 0 20%, #a347ff 21% 42%, #5d19d6 43% 62%, #d789ff 63% 76%, #7e28f5 77% 100%);
+      box-shadow: inset -8px -9px 0 rgba(42, 0, 112, 0.24), inset 7px 7px 0 rgba(255,255,255,0.16);
     }
 
     .type-5 {
-      border-radius: 48% 52% 58% 42%;
-      background: radial-gradient(circle at 34% 24%, #fff35c 0 12%, #ffd400 37%, #b58600 100%);
+      width: 82%;
+      height: 82%;
+      border-radius: 50%;
+      background:
+        repeating-conic-gradient(from -18deg, rgba(255,255,255,0.52) 0 9deg, transparent 9deg 28deg),
+        radial-gradient(circle at 35% 25%, #fff66f 0 12%, #ffd300 42%, #b18200 100%);
+      box-shadow: inset -8px -9px 0 rgba(113, 79, 0, 0.22), inset 8px 7px 0 rgba(255,255,255,0.2);
     }
+
+    .type-2::before,
+    .type-2::after { transform: rotate(-45deg); }
 
     .controls {
       display: grid;
@@ -794,39 +828,47 @@
       }
     }
 
-    function softPad(freqs, startTime, duration = 1.55) {
+    function softPad(freqs, startTime, duration = 1.2) {
       for (const freq of freqs) {
-        tone(freq, duration, 0.014, "sine", startTime);
-        tone(freq * 2, duration * 0.8, 0.004, "sine", startTime + 0.05);
+        tone(freq, duration, 0.009, "sine", startTime);
+        tone(freq * 2, duration * 0.58, 0.005, "sine", startTime + 0.04);
       }
     }
 
     function startMusic() {
       if (state.musicTimer || !state.audio) return;
       const chords = [
-        [349, 440, 523, 698],
-        [392, 494, 587, 784],
-        [330, 415, 494, 659],
-        [523, 659, 784, 1047]
+        [523, 659, 784, 1047],
+        [587, 740, 880, 1175],
+        [494, 622, 784, 988],
+        [659, 784, 988, 1319]
       ];
-      const bass = [175, 196, 165, 262];
-      const melody = [698, 784, 880, 784, 659, 784, 1047, 0, 880, 784, 698, 659, 784, 880, 784, 0];
+      const bounce = [262, 294, 247, 330];
+      const melody = [
+        1047, 1175, 1319, 1175, 988, 1175, 1568, 0,
+        1319, 1175, 1047, 988, 1175, 1319, 1175, 0,
+        988, 1047, 1175, 1319, 1568, 1319, 1175, 1047,
+        1175, 1319, 1568, 1760, 1568, 1319, 1175, 0
+      ];
+      const sparkle = [1568, 1760, 1976, 2093];
       let bar = 0;
       const playBar = () => {
         if (!state.audio || state.audio.state === "suspended") return;
         const now = state.audio.currentTime + 0.04;
         const index = bar % chords.length;
-        softPad(chords[index], now, 1.48);
-        tone(bass[index], 0.72, 0.02, "sine", now + 0.02);
-        tone(bass[index] * 1.5, 0.3, 0.011, "sine", now + 0.56);
-        for (let i = 0; i < 4; i += 1) {
-          const note = melody[(bar * 4 + i) % melody.length];
-          if (note) tone(note, 0.28, 0.018, "sine", now + 0.18 + i * 0.3);
+        softPad(chords[index], now, 1.05);
+        tone(bounce[index], 0.22, 0.014, "sine", now + 0.02);
+        tone(bounce[index] * 2, 0.16, 0.01, "sine", now + 0.32);
+        tone(bounce[index] * 1.5, 0.18, 0.009, "sine", now + 0.62);
+        for (let i = 0; i < 8; i += 1) {
+          const note = melody[(bar * 8 + i) % melody.length];
+          if (note) tone(note, 0.18, 0.018, "sine", now + 0.08 + i * 0.145);
+          if (i === 3 || i === 7) tone(sparkle[(bar + i) % sparkle.length], 0.16, 0.009, "sine", now + 0.1 + i * 0.145);
         }
         bar += 1;
       };
       playBar();
-      state.musicTimer = setInterval(playBar, 1280);
+      state.musicTimer = setInterval(playBar, 1160);
     }
 
     document.addEventListener("gesturestart", event => event.preventDefault());
