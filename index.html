@@ -170,12 +170,12 @@
 
     .candy {
       position: relative;
-      width: 86%;
-      height: 86%;
+      width: 84%;
+      height: 84%;
       border-radius: 50%;
       filter: drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22));
       transform-origin: center;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .candy::before {
@@ -186,6 +186,7 @@
       background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.1));
       transform: rotate(-18deg);
       mix-blend-mode: screen;
+      pointer-events: none;
     }
 
     .candy::after {
@@ -197,56 +198,115 @@
         radial-gradient(circle at 38% 32%, rgba(255,255,255,0.86) 0 7%, transparent 8%),
         radial-gradient(circle at 70% 80%, rgba(0,0,0,0.16) 0 18%, transparent 19%);
       opacity: 0.68;
+      pointer-events: none;
     }
 
     .type-0 {
-      width: 90%;
+      width: 72%;
       height: 72%;
-      border-radius: 48% 52% 46% 54% / 64% 66% 34% 36%;
+      margin-top: 8%;
+      border-radius: 30% 30% 10% 10%;
+      transform: rotate(45deg);
       background:
-        radial-gradient(circle at 28% 22%, rgba(255,255,255,0.92) 0 9%, transparent 10%),
-        linear-gradient(135deg, #ff72a0 0 18%, #f21861 42%, #a9003c 100%);
-      box-shadow: inset -8px -9px 0 rgba(95, 0, 48, 0.18), inset 8px 7px 0 rgba(255,255,255,0.2);
+        radial-gradient(circle at 28% 24%, rgba(255,255,255,0.92) 0 10%, transparent 11%),
+        linear-gradient(135deg, #ff76a7 0 20%, #f20f62 48%, #a9003e 100%);
+      box-shadow: inset -8px -9px 0 rgba(95, 0, 48, 0.22), inset 7px 7px 0 rgba(255,255,255,0.2);
+    }
+
+    .type-0::before,
+    .type-0::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: inherit;
+      box-shadow: inherit;
+      pointer-events: none;
+    }
+
+    .type-0::before {
+      left: -50%;
+      top: 0;
+    }
+
+    .type-0::after {
+      left: 0;
+      top: -50%;
     }
 
     .type-1 {
-      width: 74%;
-      height: 90%;
-      border-radius: 46% 54% 48% 52% / 58% 62% 38% 42%;
+      width: 72%;
+      height: 58%;
+      border-radius: 42% 58% 48% 52% / 62% 58% 42% 38%;
       background:
-        repeating-linear-gradient(35deg, rgba(255,255,255,0.28) 0 5px, transparent 5px 13px),
-        radial-gradient(circle at 35% 20%, #ffd584 0 12%, #ff8b18 42%, #b44700 100%);
-      box-shadow: inset -7px -10px 0 rgba(91, 32, 0, 0.2), inset 7px 8px 0 rgba(255,255,255,0.2);
+        radial-gradient(circle at 34% 25%, rgba(255,255,255,0.86) 0 10%, transparent 11%),
+        repeating-linear-gradient(35deg, rgba(255,255,255,0.26) 0 5px, transparent 5px 13px),
+        linear-gradient(145deg, #ffd17d 0 12%, #ff8d18 44%, #b44700 100%);
+      box-shadow: inset -7px -8px 0 rgba(91, 32, 0, 0.22), inset 7px 7px 0 rgba(255,255,255,0.18);
+    }
+
+    .type-1::before,
+    .type-1::after {
+      content: "";
+      position: absolute;
+      top: 18%;
+      width: 30%;
+      height: 64%;
+      background: linear-gradient(135deg, #ffbb58, #e76900);
+      clip-path: polygon(0 50%, 100% 0, 78% 50%, 100% 100%);
+      filter: brightness(1.04);
+      pointer-events: none;
+    }
+
+    .type-1::before {
+      left: -22%;
+    }
+
+    .type-1::after {
+      right: -22%;
+      transform: scaleX(-1);
     }
 
     .type-2 {
-      width: 86%;
-      height: 86%;
-      border-radius: 26%;
-      transform: rotate(45deg);
+      width: 80%;
+      height: 80%;
+      border-radius: 20%;
+      transform: rotate(45deg) scale(0.92);
       background:
-        linear-gradient(90deg, transparent 0 37%, rgba(255,255,255,0.34) 38% 48%, transparent 49% 100%),
-        radial-gradient(circle at 28% 20%, #91fbff 0 11%, #00a8ff 40%, #0059b9 100%);
-      box-shadow: inset -8px -8px 0 rgba(0, 50, 116, 0.22), inset 7px 7px 0 rgba(255,255,255,0.18);
+        linear-gradient(135deg, rgba(255,255,255,0.58) 0 18%, transparent 19% 100%),
+        linear-gradient(45deg, transparent 0 35%, rgba(255,255,255,0.28) 36% 48%, transparent 49% 100%),
+        radial-gradient(circle at 28% 22%, #9afdff 0 10%, #00a8ff 42%, #0056b7 100%);
+      box-shadow: inset -8px -8px 0 rgba(0, 50, 116, 0.24), inset 7px 7px 0 rgba(255,255,255,0.18);
     }
 
     .type-3 {
-      width: 88%;
-      height: 68%;
+      width: 82%;
+      height: 62%;
       border-radius: 999px;
+      transform: rotate(-8deg);
       background:
         radial-gradient(circle at 28% 26%, rgba(255,255,255,0.88) 0 9%, transparent 10%),
-        linear-gradient(160deg, #b8ff65 0 18%, #24c83d 46%, #08782d 100%);
+        linear-gradient(160deg, #c4ff75 0 18%, #28cc45 46%, #08782d 100%);
       box-shadow: inset -10px -7px 0 rgba(0, 80, 30, 0.2), inset 9px 6px 0 rgba(255,255,255,0.18);
+    }
+
+    .type-3::after {
+      content: "";
+      position: absolute;
+      inset: 28% 18% 36% 18%;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.26);
+      pointer-events: none;
     }
 
     .type-4 {
       width: 82%;
       height: 82%;
-      border-radius: 32% 68% 35% 65% / 62% 36% 64% 38%;
+      border-radius: 50%;
       background:
-        radial-gradient(circle at 28% 20%, #e2bcff 0 13%, transparent 14%),
-        conic-gradient(from 40deg, #5613c6 0 20%, #a347ff 21% 42%, #5d19d6 43% 62%, #d789ff 63% 76%, #7e28f5 77% 100%);
+        radial-gradient(circle at 28% 20%, rgba(255,255,255,0.9) 0 10%, transparent 11%),
+        repeating-conic-gradient(from 18deg, #efe2ff 0 13deg, #a445ff 13deg 34deg, #5a16d2 34deg 55deg, #d481ff 55deg 68deg);
       box-shadow: inset -8px -9px 0 rgba(42, 0, 112, 0.24), inset 7px 7px 0 rgba(255,255,255,0.16);
     }
 
@@ -255,8 +315,9 @@
       height: 82%;
       border-radius: 50%;
       background:
-        repeating-conic-gradient(from -18deg, rgba(255,255,255,0.52) 0 9deg, transparent 9deg 28deg),
-        radial-gradient(circle at 35% 25%, #fff66f 0 12%, #ffd300 42%, #b18200 100%);
+        radial-gradient(circle at 50% 50%, rgba(255,255,255,0.35) 0 16%, transparent 17%),
+        repeating-conic-gradient(from -18deg, rgba(255,255,255,0.55) 0 6deg, transparent 6deg 25deg),
+        radial-gradient(circle at 35% 25%, #fff66f 0 12%, #ffd300 42%, #ad7d00 100%);
       box-shadow: inset -8px -9px 0 rgba(113, 79, 0, 0.22), inset 8px 7px 0 rgba(255,255,255,0.2);
     }
 
@@ -828,47 +889,47 @@
       }
     }
 
-    function softPad(freqs, startTime, duration = 1.2) {
+    function softPad(freqs, startTime, duration = 0.92) {
       for (const freq of freqs) {
-        tone(freq, duration, 0.009, "sine", startTime);
-        tone(freq * 2, duration * 0.58, 0.005, "sine", startTime + 0.04);
+        tone(freq, duration, 0.006, "sine", startTime);
       }
     }
 
     function startMusic() {
       if (state.musicTimer || !state.audio) return;
       const chords = [
-        [523, 659, 784, 1047],
-        [587, 740, 880, 1175],
-        [494, 622, 784, 988],
-        [659, 784, 988, 1319]
+        [523, 659, 784],
+        [392, 587, 784],
+        [440, 523, 659],
+        [349, 523, 698]
       ];
-      const bounce = [262, 294, 247, 330];
+      const bounce = [262, 196, 220, 175];
       const melody = [
-        1047, 1175, 1319, 1175, 988, 1175, 1568, 0,
-        1319, 1175, 1047, 988, 1175, 1319, 1175, 0,
-        988, 1047, 1175, 1319, 1568, 1319, 1175, 1047,
-        1175, 1319, 1568, 1760, 1568, 1319, 1175, 0
+        1047, 1175, 1319, 1568, 1319, 1175, 1047, 0,
+        1568, 1760, 1568, 1319, 1175, 1319, 1047, 0,
+        1175, 1319, 1568, 1760, 1568, 1319, 1175, 1047,
+        1319, 1568, 1760, 2093, 1760, 1568, 1319, 0
       ];
-      const sparkle = [1568, 1760, 1976, 2093];
+      const sparkle = [2093, 2349, 2637, 3136];
       let bar = 0;
       const playBar = () => {
         if (!state.audio || state.audio.state === "suspended") return;
         const now = state.audio.currentTime + 0.04;
         const index = bar % chords.length;
-        softPad(chords[index], now, 1.05);
-        tone(bounce[index], 0.22, 0.014, "sine", now + 0.02);
-        tone(bounce[index] * 2, 0.16, 0.01, "sine", now + 0.32);
-        tone(bounce[index] * 1.5, 0.18, 0.009, "sine", now + 0.62);
+        softPad(chords[index], now, 0.86);
+        tone(bounce[index], 0.18, 0.009, "sine", now + 0.02);
+        tone(bounce[index] * 2, 0.12, 0.008, "triangle", now + 0.26);
+        tone(bounce[index] * 2, 0.12, 0.008, "triangle", now + 0.5);
+        tone(bounce[index] * 3, 0.14, 0.007, "triangle", now + 0.74);
         for (let i = 0; i < 8; i += 1) {
           const note = melody[(bar * 8 + i) % melody.length];
-          if (note) tone(note, 0.18, 0.018, "sine", now + 0.08 + i * 0.145);
-          if (i === 3 || i === 7) tone(sparkle[(bar + i) % sparkle.length], 0.16, 0.009, "sine", now + 0.1 + i * 0.145);
+          if (note) tone(note, 0.115, 0.015, "triangle", now + 0.06 + i * 0.115);
+          if (i === 3 || i === 7) tone(sparkle[(bar + i) % sparkle.length], 0.105, 0.006, "sine", now + 0.07 + i * 0.115);
         }
         bar += 1;
       };
       playBar();
-      state.musicTimer = setInterval(playBar, 1160);
+      state.musicTimer = setInterval(playBar, 960);
     }
 
     document.addEventListener("gesturestart", event => event.preventDefault());
