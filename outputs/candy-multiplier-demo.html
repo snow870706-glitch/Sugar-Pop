@@ -359,7 +359,8 @@
   <script>
     const cols = 7;
     const rows = 9;
-    const candyTypes = 6;
+    const candyTypes = 5;
+    const refillNeighborBias = 0.25;
     const minGroup = 3;
     const comboWindow = 2000;
 
@@ -409,6 +410,23 @@
 
     function makeCell(type = randomCandy()) {
       return { type };
+    }
+
+    function biasedRefillCandy(r, c) {
+      if (Math.random() >= refillNeighborBias) return randomCandy();
+      const options = [];
+      for (const next of [
+        { r: r + 1, c },
+        { r, c: c - 1 },
+        { r, c: c + 1 },
+        { r: r - 1, c }
+      ]) {
+        if (!inBounds(next.r, next.c)) continue;
+        const cell = state.board[next.r][next.c];
+        if (cell) options.push(cell.type);
+      }
+      if (!options.length) return randomCandy();
+      return options[Math.floor(Math.random() * options.length)];
     }
 
     function wait(ms) {
@@ -562,7 +580,9 @@
     }
 
     function scoreFor(count) {
-      return count * 10 + Math.max(0, count - 3) * 8;
+      if (count <= 3) return count * 10;
+      if (count === 4) return 48;
+      return Math.round(count * 12 + Math.pow(count - 4, 2) * 12);
     }
 
     function groupAnchor(group, clicked) {
@@ -595,7 +615,7 @@
       for (let r = 0; r < rows; r += 1) {
         for (let c = 0; c < cols; c += 1) {
           if (!state.board[r][c]) {
-            state.board[r][c] = makeCell();
+            state.board[r][c] = makeCell(biasedRefillCandy(r, c));
             filled.push({ r, c });
           }
         }
