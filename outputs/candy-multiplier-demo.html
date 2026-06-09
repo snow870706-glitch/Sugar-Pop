@@ -176,9 +176,10 @@
 
     .cell:active { transform: scale(0.94); }
     .cell.invalid { animation: shake 260ms ease; }
-    .cell.clearing .candy { animation: candy-clear 330ms ease forwards; }
-    .cell.entering .candy { animation: candy-enter 360ms cubic-bezier(.2, .95, .24, 1.05); }
-    .cell.settling .candy { animation: candy-settle 280ms cubic-bezier(.2, .95, .24, 1.05); }
+    .cell.clearing .candy { animation: candy-clear 260ms ease forwards; }
+    .cell.entering .candy { animation: candy-enter 300ms cubic-bezier(.16, .96, .2, 1.04); }
+    .cell.settling .candy { animation: candy-settle 230ms cubic-bezier(.16, .96, .2, 1.04); }
+    .cell.wild-born .special-wild { animation: wild-born 420ms cubic-bezier(.16, .96, .2, 1.04) both, wild-idle 1180ms ease-in-out infinite 420ms; }
     .cell.hint { background: rgba(255,255,255,0.48); }
     .cell.hint .candy { animation: hint-hop 760ms ease-in-out infinite; }
     .board.reshuffling .candy { animation: candy-vacuum 620ms cubic-bezier(.62, .02, .86, .38) forwards; }
@@ -432,7 +433,7 @@
         linear-gradient(135deg, #fff48d, #ffb82e 55%, #ff6d2e);
       box-shadow: 0 0 12px rgba(255, 222, 66, 0.9), 0 7px 14px rgba(112, 46, 76, 0.22);
       transform: translate(var(--sx), var(--sy)) scale(0.62) rotate(0deg);
-      animation: fragment-fly 720ms cubic-bezier(.18, .86, .22, 1) forwards;
+      animation: fragment-fly 560ms cubic-bezier(.18, .86, .22, 1) forwards;
       animation-delay: var(--delay);
     }
 
@@ -550,19 +551,19 @@
 
     @keyframes candy-clear {
       0% { opacity: 1; transform: scale(1); filter: brightness(1.1) drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22)); }
-      55% { opacity: 1; transform: scale(1.18) rotate(8deg); filter: brightness(1.35) drop-shadow(0 0 18px rgba(255,255,255,0.9)); }
-      100% { opacity: 0; transform: scale(0.22) rotate(-14deg); }
+      48% { opacity: 1; transform: scale(1.14) rotate(6deg); filter: brightness(1.35) drop-shadow(0 0 18px rgba(255,255,255,0.9)); }
+      100% { opacity: 0; transform: scale(0.18) rotate(-12deg); }
     }
 
     @keyframes candy-enter {
-      0% { opacity: 0; transform: translateY(calc(var(--cell) * -1.2)) scale(0.82); }
-      74% { opacity: 1; transform: translateY(4px) scale(1.04); }
+      0% { opacity: 0; transform: translateY(calc(var(--cell) * -0.95)) scale(0.86); }
+      76% { opacity: 1; transform: translateY(3px) scale(1.025); }
       100% { opacity: 1; transform: translateY(0) scale(1); }
     }
 
     @keyframes candy-settle {
-      0% { transform: translateY(calc(var(--cell) * -0.6)) scale(0.96); }
-      70% { transform: translateY(3px) scale(1.03); }
+      0% { transform: translateY(calc(var(--cell) * -0.42)) scale(0.98); }
+      72% { transform: translateY(2px) scale(1.018); }
       100% { transform: translateY(0) scale(1); }
     }
 
@@ -660,6 +661,12 @@
     @keyframes wild-spin {
       0% { transform: rotate(0deg) scale(1.06); }
       100% { transform: rotate(360deg) scale(1.06); }
+    }
+
+    @keyframes wild-born {
+      0% { opacity: 0; transform: scale(0.28) rotate(-80deg); filter: brightness(1.8) drop-shadow(0 0 18px rgba(255,244,84,0.95)); }
+      58% { opacity: 1; transform: scale(1.18) rotate(12deg); filter: brightness(1.45) drop-shadow(0 0 22px rgba(255,244,84,0.95)); }
+      100% { opacity: 1; transform: scale(1) rotate(0deg); }
     }
 
     @media (max-height: 760px) {
@@ -767,6 +774,7 @@
       entering: new Set(),
       settling: new Set(),
       invalid: new Set(),
+      wildBorn: new Set(),
       reshuffling: false,
       spawning: false,
       popups: [],
@@ -774,7 +782,8 @@
       hintTimer: null,
       audio: null,
       musicTimer: null,
-      fragmentFlights: 0
+      fragmentFlights: 0,
+      fragmentPromises: []
     };
 
     const walletState = {
@@ -991,6 +1000,7 @@
       state.entering.clear();
       state.settling.clear();
       state.invalid.clear();
+      state.wildBorn.clear();
       state.popups = [];
       state.bursts = [];
       roundState.chainCount = slot.chainCount || 0;
@@ -1044,6 +1054,7 @@
           if (state.entering.has(key)) button.classList.add("entering");
           if (state.settling.has(key)) button.classList.add("settling");
           if (state.invalid.has(key)) button.classList.add("invalid");
+          if (state.wildBorn.has(key)) button.classList.add("wild-born");
           if (state.hint.some(pos => pos.r === r && pos.c === c)) button.classList.add("hint");
           if (cell) {
             const candy = document.createElement("div");
@@ -1465,6 +1476,21 @@
       return fragments;
     }
 
+    function queueFragmentCollection(tier, anchor, comboWaves) {
+      const promise = collectFragments(tier, anchor, comboWaves);
+      state.fragmentPromises.push(promise);
+      promise.finally(() => {
+        state.fragmentPromises = state.fragmentPromises.filter(item => item !== promise);
+      });
+      return promise;
+    }
+
+    async function waitForFragmentCollections() {
+      while (state.fragmentPromises.length) {
+        await Promise.all([...state.fragmentPromises]);
+      }
+    }
+
     async function maybeOpenBonus() {
       if (walletState.fragments < mathConfig.fragmentTarget || roundState.bonusPending) return false;
       updateUI();
@@ -1569,11 +1595,11 @@
       render();
       const specialMessage = tierMessage(tier, effectiveCount);
       const comboText = comboWaves ? `Chain ${comboWaves}！` : "";
-      setToast(createWild ? "百搭糖果形成！碎片正在收集。" : fragments ? `${specialMessage || comboText} +${fragments} Jackpot 碎片` : `${comboText}普通消去不派彩。`);
+      setToast(createWild ? "百搭糖果形成！碎片正在收集。" : fragments ? `${specialMessage || comboText} +${formatDecimal(fragments)} Jackpot 碎片` : `${comboText}普通消去不派彩。`);
       playSound(tier ? `clear-${tier}` : comboWaves ? "combo" : "clear");
       if (createWild) playSound("wild");
-      await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
-      await collectFragments(tier, anchor, comboWaves);
+      await wait(tier >= 20 ? 520 : tier >= 10 ? 400 : tier >= 6 ? 320 : 220);
+      if (fragments) queueFragmentCollection(tier, anchor, comboWaves);
 
       const wildSpawn = createWild ? pickWildSpawnPosition(group, anchor) : null;
       const wildSpawnKey = wildSpawn ? keyOf(wildSpawn) : "";
@@ -1593,11 +1619,15 @@
       const filled = refillBoard();
       state.settling = new Set(moved.map(keyOf));
       state.entering = new Set(filled.map(keyOf));
+      state.wildBorn = createWild
+        ? new Set(state.board.flatMap((row, r) => row.map((cell, c) => cell?.special === "wild" ? keyOf({ r, c }) : null)).filter(Boolean))
+        : new Set();
       render();
-      await wait(360);
+      await wait(filled.length ? 285 : 210);
 
       state.settling.clear();
       state.entering.clear();
+      state.wildBorn.clear();
       state.hint = [];
       updateUI();
       render();
@@ -1654,12 +1684,13 @@
       if (chain) {
         setToast(`Combo ${chain}！百搭連爆倍率 x${actionMultiplier(chain).toFixed(2)}，獎項只在 Bonus 結算。`);
         playSound("combo");
-        await wait(420);
+        await wait(220);
         state.popups = [];
       }
 
+      await waitForFragmentCollections();
       if (walletState.fragments >= mathConfig.fragmentTarget) {
-        await wait(260);
+        await wait(160);
       }
       if (await maybeOpenBonus()) {
         state.busy = false;
