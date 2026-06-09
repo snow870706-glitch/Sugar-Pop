@@ -754,7 +754,7 @@
       fragmentTarget: 10,
       fragmentAwards: { 6: 1, 10: 2, 20: 5 },
       bonusMultipliers: [5, 10, 20, 50, 100],
-      bonusSuccessRates: [0.93, 0.8, 0.65, 0.454, 0.3],
+      bonusSuccessRates: [0.93, 0.8, 0.65, 0.4, 0.3],
       consolationMultiplier: 0
     };
 
@@ -784,6 +784,8 @@
       roundWin: 0,
       fragments: 0
     };
+
+    const betSlots = {};
 
     const roundState = {
       actionId: 0,
@@ -891,6 +893,14 @@
       return Math.round(value).toLocaleString("en-US");
     }
 
+    function oneDecimal(value) {
+      return Math.round(value * 10) / 10;
+    }
+
+    function formatDecimal(value) {
+      return oneDecimal(value).toFixed(1);
+    }
+
     function setToast(text) {
       els.toast.textContent = text;
     }
@@ -900,10 +910,11 @@
       els.bet.textContent = money(walletState.bet);
       els.totalWin.textContent = money(walletState.totalWin);
       els.roundWin.textContent = money(walletState.roundWin);
-      els.fragments.textContent = `${Math.min(walletState.fragments, mathConfig.fragmentTarget)}/${mathConfig.fragmentTarget}`;
-      els.chain.textContent = `x${comboMultiplier().toFixed(1)}`;
-      els.betDown.disabled = state.busy || walletState.bet <= mathConfig.minBet;
-      els.betUp.disabled = state.busy || walletState.bet >= mathConfig.maxBet || walletState.bet + mathConfig.betStep > walletState.credits;
+      els.fragments.textContent = `${formatDecimal(Math.min(walletState.fragments, mathConfig.fragmentTarget))}/${formatDecimal(mathConfig.fragmentTarget)}`;
+      els.chain.textContent = `Chain x${comboMultiplier().toFixed(1)}`;
+      const betLocked = state.busy || roundState.bonusPending || state.fragmentFlights > 0;
+      els.betDown.disabled = betLocked || walletState.bet <= mathConfig.minBet;
+      els.betUp.disabled = betLocked || walletState.bet >= mathConfig.maxBet || walletState.bet + mathConfig.betStep > walletState.credits;
     }
 
     function boardHash() {
@@ -927,11 +938,89 @@
       };
     }
 
-    function changeBet(delta) {
-      if (state.busy || roundState.bonusPending) return;
-      const next = Math.max(mathConfig.minBet, Math.min(mathConfig.maxBet, walletState.bet + delta));
-      walletState.bet = Math.min(next, Math.max(mathConfig.minBet, walletState.credits));
+    function cloneBoard(board) {
+      return board.map(row => row.map(cell => cell ? { type: cell.type, special: cell.special } : null));
+    }
+
+    function saveCurrentBetSlot() {
+      betSlots[walletState.bet] = {
+        board: cloneBoard(state.board),
+        fragments: oneDecimal(walletState.fragments),
+        roundWin: walletState.roundWin,
+        combo: state.combo,
+        chainCount: roundState.chainCount,
+        bonusPending: roundState.bonusPending,
+        bonusStep: roundState.bonusStep,
+        bonusOffer: roundState.bonusOffer,
+        bonusSeed: roundState.bonusSeed,
+        rngNonce: roundState.rngNonce,
+        boardHash: roundState.boardHash
+      };
+    }
+
+    function createBetSlot() {
+      const previousBoard = state.board;
+      state.board = randomPlayableBoard();
+      const slot = {
+        board: cloneBoard(state.board),
+        fragments: 0,
+        roundWin: 0,
+        combo: 0,
+        chainCount: 0,
+        bonusPending: false,
+        bonusStep: 0,
+        bonusOffer: 0,
+        bonusSeed: 0,
+        rngNonce: 0,
+        boardHash: boardHash()
+      };
+      state.board = previousBoard;
+      return slot;
+    }
+
+    function loadBetSlot(bet, wasExisting) {
+      const slot = betSlots[bet] || createBetSlot();
+      betSlots[bet] = slot;
+      walletState.bet = bet;
+      walletState.fragments = oneDecimal(slot.fragments || 0);
+      walletState.roundWin = slot.roundWin || 0;
+      state.board = cloneBoard(slot.board);
+      state.combo = slot.combo || 0;
+      state.hint = [];
+      state.clearing.clear();
+      state.entering.clear();
+      state.settling.clear();
+      state.invalid.clear();
+      state.popups = [];
+      state.bursts = [];
+      roundState.chainCount = slot.chainCount || 0;
+      roundState.baseFragments = 0;
+      roundState.bonusPending = !!slot.bonusPending;
+      roundState.bonusStep = slot.bonusStep || 0;
+      roundState.bonusOffer = slot.bonusOffer || 0;
+      roundState.bonusSeed = slot.bonusSeed || 0;
+      roundState.rngNonce = slot.rngNonce || 0;
+      roundState.boardHash = slot.boardHash || boardHash();
+      if (roundState.bonusPending) {
+        renderBonus();
+        els.bonusOverlay.classList.add("open");
+      } else {
+        els.bonusOverlay.classList.remove("open");
+      }
+      setToast(wasExisting ? `Bet ${bet} 狀態已恢復。` : `Bet ${bet} 已建立新盤面。`);
       updateUI();
+      render();
+      resetIdleHint();
+    }
+
+    function changeBet(delta) {
+      if (state.busy || roundState.bonusPending || state.fragmentFlights > 0) return;
+      const next = Math.max(mathConfig.minBet, Math.min(mathConfig.maxBet, walletState.bet + delta));
+      const targetBet = Math.min(next, Math.max(mathConfig.minBet, walletState.credits));
+      if (targetBet === walletState.bet) return;
+      clearIdleHint();
+      saveCurrentBetSlot();
+      loadBetSlot(targetBet, !!betSlots[targetBet]);
     }
 
     function render() {
@@ -1232,8 +1321,9 @@
       };
     }
 
-    async function flyFragments(anchor, count) {
-      if (!count) return;
+    async function flyFragments(anchor, amount) {
+      if (!amount) return;
+      const count = Math.max(1, Math.ceil(amount));
       const start = boardPoint(anchor);
       const target = fragmentTargetPoint();
       const flights = [];
@@ -1364,12 +1454,13 @@
       return weighted[weighted.length - 1].pos;
     }
 
-    async function collectFragments(tier, anchor) {
-      const fragments = fragmentsForTier(tier);
+    async function collectFragments(tier, anchor, comboWaves) {
+      const baseFragments = fragmentsForTier(tier);
+      const fragments = oneDecimal(baseFragments * actionMultiplier(comboWaves));
       if (!fragments) return 0;
       await flyFragments(anchor, fragments);
-      walletState.fragments += fragments;
-      roundState.baseFragments += fragments;
+      walletState.fragments = oneDecimal(walletState.fragments + fragments);
+      roundState.baseFragments = oneDecimal(roundState.baseFragments + fragments);
       updateUI();
       return fragments;
     }
@@ -1378,7 +1469,7 @@
       if (walletState.fragments < mathConfig.fragmentTarget || roundState.bonusPending) return false;
       updateUI();
       await animateFragmentCharge();
-      walletState.fragments -= mathConfig.fragmentTarget;
+      walletState.fragments = oneDecimal(walletState.fragments - mathConfig.fragmentTarget);
       roundState.bonusPending = true;
       roundState.bonusStep = 0;
       roundState.bonusSeed = Math.round(walletState.bet * actionMultiplier(roundState.chainCount));
@@ -1473,8 +1564,8 @@
       state.combo = comboWaves;
       state.clearing = new Set(group.map(keyOf));
       const tier = showClearBurst(group, anchor, clearTier(effectiveCount));
-      const fragments = fragmentsForTier(tier);
-      if (fragments) showScorePopup(anchor, `+${fragments} Frag`, comboWaves);
+      const fragments = oneDecimal(fragmentsForTier(tier) * actionMultiplier(comboWaves));
+      if (fragments) showScorePopup(anchor, `+${formatDecimal(fragments)} Frag`, comboWaves);
       render();
       const specialMessage = tierMessage(tier, effectiveCount);
       const comboText = comboWaves ? `Chain ${comboWaves}！` : "";
@@ -1482,7 +1573,7 @@
       playSound(tier ? `clear-${tier}` : comboWaves ? "combo" : "clear");
       if (createWild) playSound("wild");
       await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
-      await collectFragments(tier, anchor);
+      await collectFragments(tier, anchor, comboWaves);
 
       const wildSpawn = createWild ? pickWildSpawnPosition(group, anchor) : null;
       const wildSpawnKey = wildSpawn ? keyOf(wildSpawn) : "";
@@ -1749,6 +1840,7 @@
     els.gambleBonus.addEventListener("click", gambleBonus);
 
     createBoard();
+    saveCurrentBetSlot();
     updateUI();
     render();
     resetIdleHint();

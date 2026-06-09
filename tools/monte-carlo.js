@@ -50,14 +50,23 @@ function fragmentsForTier(tier) {
   return 0;
 }
 
-function playBonus() {
-  let currentOffer = bet * config.bonusMultipliers[0];
+function oneDecimal(value) {
+  return Math.round(value * 10) / 10;
+}
+
+function actionMultiplier(chain) {
+  if (!chain) return 1;
+  return 1 + chain * 0.25 + Math.max(0, chain - 1) * 0.15;
+}
+
+function playBonus(seed) {
+  let currentOffer = seed * config.bonusMultipliers[0];
   for (let step = 0; step < config.bonusMultipliers.length; step += 1) {
-    currentOffer = bet * config.bonusMultipliers[step];
+    currentOffer = seed * config.bonusMultipliers[step];
     const isFinal = step === config.bonusMultipliers.length - 1;
     if (isFinal) return currentOffer;
     if (Math.random() > config.bonusSuccessRates[step]) {
-      return bet * config.consolationMultiplier;
+      return seed * config.consolationMultiplier;
     }
   }
   return currentOffer;
@@ -73,12 +82,14 @@ let maxActionWin = 0;
 for (let i = 0; i < actions; i += 1) {
   totalBet += bet;
   const tier = pickTier();
-  fragments += fragmentsForTier(tier);
+  fragments = oneDecimal(fragments + fragmentsForTier(tier));
+  let finalChain = 0;
   if (tier >= wildCreateThreshold) {
     let chainChance = firstChainChance;
     for (let chain = 0; chain < 12 && Math.random() < chainChance; chain += 1) {
+      finalChain = chain + 1;
       const chainTier = pickChainTier();
-      fragments += fragmentsForTier(chainTier);
+      fragments = oneDecimal(fragments + fragmentsForTier(chainTier) * actionMultiplier(finalChain));
       if (chainTier < wildCreateThreshold) break;
       chainChance *= chainDecay;
     }
@@ -86,9 +97,9 @@ for (let i = 0; i < actions; i += 1) {
   let actionWin = 0;
 
   while (fragments >= config.fragmentTarget) {
-    fragments -= config.fragmentTarget;
+    fragments = oneDecimal(fragments - config.fragmentTarget);
     bonusCount += 1;
-    actionWin += playBonus();
+    actionWin += playBonus(bet * actionMultiplier(finalChain));
   }
 
   if (actionWin > 0) winningActions += 1;

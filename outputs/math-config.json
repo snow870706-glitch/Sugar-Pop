@@ -12,7 +12,7 @@
     "20": 5
   },
   "bonusMultipliers": [5, 10, 20, 50, 100],
-  "bonusSuccessRates": [0.93, 0.8, 0.65, 0.454, 0.3],
+  "bonusSuccessRates": [0.93, 0.8, 0.65, 0.4, 0.3],
   "consolationMultiplier": 0,
   "notes": [
     "Base clears do not pay directly.",
