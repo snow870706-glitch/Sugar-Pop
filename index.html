@@ -263,6 +263,93 @@
 
     .score-pop.combo { background: linear-gradient(135deg, #7d42ff, #1cc5f3); }
 
+    .clear-burst {
+      position: absolute;
+      left: calc(9px + var(--c) * var(--cell) + var(--cell) * 0.5);
+      top: calc(9px + var(--r) * var(--cell) + var(--cell) * 0.5);
+      z-index: 3;
+      width: calc(var(--cell) * var(--burst-size));
+      height: calc(var(--cell) * var(--burst-size));
+      margin-left: calc(var(--cell) * var(--burst-size) * -0.5);
+      margin-top: calc(var(--cell) * var(--burst-size) * -0.5);
+      border-radius: 50%;
+      pointer-events: none;
+      opacity: 0;
+      animation: burst-pop 760ms ease-out both;
+    }
+
+    .clear-burst::before,
+    .clear-burst::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .clear-burst::before {
+      border: max(3px, calc(var(--cell) * 0.055)) solid rgba(255,255,255,0.92);
+      box-shadow: 0 0 24px rgba(255,255,255,0.9), inset 0 0 22px rgba(255,255,255,0.42);
+    }
+
+    .clear-burst::after {
+      background:
+        radial-gradient(circle, rgba(255,255,255,0.95) 0 9%, transparent 10% 100%),
+        conic-gradient(from 12deg, rgba(255,72,145,0.95), rgba(255,214,46,0.88), rgba(64,220,255,0.92), rgba(140,70,255,0.88), rgba(255,72,145,0.95));
+      mask: radial-gradient(circle, transparent 0 31%, #000 32% 40%, transparent 41% 100%);
+      opacity: 0.92;
+      animation: burst-spin 760ms ease-out both;
+    }
+
+    .clear-burst.tier-10 {
+      z-index: 5;
+      animation-duration: 920ms;
+    }
+
+    .clear-burst.tier-10::before {
+      border-width: max(4px, calc(var(--cell) * 0.08));
+      box-shadow: 0 0 30px rgba(255,214,46,0.9), 0 0 52px rgba(255,72,145,0.44), inset 0 0 26px rgba(255,255,255,0.5);
+    }
+
+    .clear-burst.tier-10::after {
+      background:
+        repeating-conic-gradient(from 10deg, rgba(255,255,255,0.95) 0 8deg, transparent 8deg 18deg),
+        conic-gradient(from 20deg, rgba(255,72,145,0.96), rgba(255,214,46,0.92), rgba(45,219,123,0.84), rgba(64,220,255,0.96), rgba(140,70,255,0.9), rgba(255,72,145,0.96));
+      mask: radial-gradient(circle, transparent 0 24%, #000 25% 49%, transparent 50% 100%);
+    }
+
+    .clear-burst.tier-20 {
+      z-index: 6;
+      animation: mega-burst 1120ms ease-out both;
+    }
+
+    .clear-burst.tier-20::before {
+      border-width: max(5px, calc(var(--cell) * 0.1));
+      box-shadow: 0 0 42px rgba(255,255,255,1), 0 0 82px rgba(255,72,145,0.62), 0 0 96px rgba(64,220,255,0.48);
+    }
+
+    .clear-burst.tier-20::after {
+      background:
+        repeating-conic-gradient(from -12deg, rgba(255,255,255,1) 0 7deg, transparent 7deg 15deg),
+        conic-gradient(from 0deg, #ff3d89, #ffd52e, #39df78, #40dcff, #8c46ff, #ff3d89);
+      mask: radial-gradient(circle, transparent 0 18%, #000 19% 58%, transparent 59% 100%);
+      animation-duration: 1120ms;
+    }
+
+    .confetti {
+      position: absolute;
+      left: calc(9px + var(--c) * var(--cell) + var(--cell) * 0.5);
+      top: calc(9px + var(--r) * var(--cell) + var(--cell) * 0.5);
+      z-index: 7;
+      width: 7px;
+      height: 13px;
+      border-radius: 3px;
+      background: hsl(var(--hue), 92%, 60%);
+      pointer-events: none;
+      animation: confetti-fly 1040ms ease-out both;
+      transform: rotate(var(--rot));
+    }
+
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
       25% { transform: translateX(-4px); }
@@ -309,6 +396,32 @@
       0% { opacity: 0; transform: translateY(10px) scale(0.76); }
       18% { opacity: 1; transform: translateY(-4px) scale(1.08); }
       100% { opacity: 0; transform: translateY(-34px) scale(0.94); }
+    }
+
+    @keyframes burst-pop {
+      0% { opacity: 0; transform: scale(0.22); filter: brightness(1.2); }
+      18% { opacity: 1; transform: scale(0.72); }
+      68% { opacity: 0.92; transform: scale(1.05); }
+      100% { opacity: 0; transform: scale(1.3); filter: brightness(1.45); }
+    }
+
+    @keyframes burst-spin {
+      0% { transform: rotate(0deg) scale(0.4); opacity: 0; }
+      24% { opacity: 1; }
+      100% { transform: rotate(220deg) scale(1.08); opacity: 0; }
+    }
+
+    @keyframes mega-burst {
+      0% { opacity: 0; transform: scale(0.18) rotate(-8deg); }
+      16% { opacity: 1; transform: scale(0.7) rotate(0deg); }
+      58% { opacity: 1; transform: scale(1.12) rotate(7deg); }
+      100% { opacity: 0; transform: scale(1.52) rotate(18deg); }
+    }
+
+    @keyframes confetti-fly {
+      0% { opacity: 0; transform: translate(0, 0) scale(0.5) rotate(var(--rot)); }
+      14% { opacity: 1; }
+      100% { opacity: 0; transform: translate(calc(var(--dx) * var(--cell)), calc(var(--dy) * var(--cell))) scale(1) rotate(calc(var(--rot) + 260deg)); }
     }
 
     @media (max-height: 760px) {
@@ -378,6 +491,7 @@
       reshuffling: false,
       spawning: false,
       popups: [],
+      bursts: [],
       hintTimer: null,
       audio: null,
       musicTimer: null
@@ -483,6 +597,26 @@
         badge.style.setProperty("--c", popup.c);
         badge.textContent = popup.text;
         els.board.appendChild(badge);
+      }
+
+      for (const burst of state.bursts) {
+        const ring = document.createElement("div");
+        ring.className = `clear-burst tier-${burst.tier}`;
+        ring.style.setProperty("--r", burst.r);
+        ring.style.setProperty("--c", burst.c);
+        ring.style.setProperty("--burst-size", burst.size);
+        els.board.appendChild(ring);
+        for (const confetti of burst.confetti || []) {
+          const bit = document.createElement("div");
+          bit.className = "confetti";
+          bit.style.setProperty("--r", burst.r);
+          bit.style.setProperty("--c", burst.c);
+          bit.style.setProperty("--dx", confetti.dx);
+          bit.style.setProperty("--dy", confetti.dy);
+          bit.style.setProperty("--rot", `${confetti.rot}deg`);
+          bit.style.setProperty("--hue", confetti.hue);
+          els.board.appendChild(bit);
+        }
       }
     }
 
@@ -664,6 +798,55 @@
       });
     }
 
+    function clearTier(count) {
+      if (count >= 20) return 20;
+      if (count >= 10) return 10;
+      if (count >= 6) return 6;
+      return 0;
+    }
+
+    function tierMessage(tier, count) {
+      if (tier >= 20) return `Candy Storm！${count} 顆超大消去！`;
+      if (tier >= 10) return `Sugar Splash！${count} 顆大消去！`;
+      if (tier >= 6) return `Sweet Burst！${count} 顆連成一片！`;
+      return "";
+    }
+
+    function makeConfetti(tier) {
+      if (tier < 20) return [];
+      return Array.from({ length: 18 }, (_, i) => {
+        const angle = (Math.PI * 2 * i) / 18;
+        const spread = 2.5 + (i % 3) * 0.38;
+        return {
+          dx: Math.cos(angle) * spread,
+          dy: Math.sin(angle) * spread - 0.25,
+          rot: i * 31,
+          hue: (i * 47) % 360
+        };
+      });
+    }
+
+    function showClearBurst(group, anchor) {
+      const tier = clearTier(group.length);
+      if (!tier) return 0;
+      const bounds = group.reduce((box, pos) => ({
+        minR: Math.min(box.minR, pos.r),
+        maxR: Math.max(box.maxR, pos.r),
+        minC: Math.min(box.minC, pos.c),
+        maxC: Math.max(box.maxC, pos.c)
+      }), { minR: rows, maxR: 0, minC: cols, maxC: 0 });
+      const span = Math.max(bounds.maxR - bounds.minR + 1, bounds.maxC - bounds.minC + 1);
+      const size = tier >= 20 ? Math.max(6.8, span + 2.8) : tier >= 10 ? Math.max(4.9, span + 2) : Math.max(3.2, span + 1.2);
+      state.bursts = [{
+        tier,
+        r: anchor.r,
+        c: anchor.c,
+        size,
+        confetti: makeConfetti(tier)
+      }];
+      return tier;
+    }
+
     async function clearGroup(group, clicked) {
       state.busy = true;
       clearIdleHint();
@@ -677,15 +860,18 @@
       state.score += gain;
       state.clearing = new Set(group.map(keyOf));
       showScorePopup(anchor, gain, state.combo);
+      const tier = showClearBurst(group, anchor);
       updateUI();
       render();
-      setToast(state.combo ? `Combo ${state.combo}！消去 ${group.length} 顆糖果。` : `消去 ${group.length} 顆糖果！`);
-      playSound(state.combo ? "combo" : "clear");
-      await wait(340);
+      const specialMessage = tierMessage(tier, group.length);
+      setToast(specialMessage || (state.combo ? `Combo ${state.combo}！消去 ${group.length} 顆糖果。` : `消去 ${group.length} 顆糖果！`));
+      playSound(tier ? `clear-${tier}` : state.combo ? "combo" : "clear");
+      await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
 
       for (const pos of group) state.board[pos.r][pos.c] = null;
       state.clearing.clear();
       state.popups = [];
+      state.bursts = [];
 
       const moved = collapseBoard();
       const filled = refillBoard();
@@ -786,6 +972,21 @@
         tone(620, 0.16, 0.055, "sine", now);
         tone(820, 0.19, 0.052, "sine", now + 0.06);
         tone(1040, 0.24, 0.042, "sine", now + 0.14);
+      } else if (kind === "clear-6") {
+        tone(587, 0.2, 0.05, "sine", now);
+        tone(784, 0.24, 0.044, "sine", now + 0.08);
+        tone(988, 0.26, 0.034, "sine", now + 0.18);
+      } else if (kind === "clear-10") {
+        tone(523, 0.24, 0.052, "sine", now);
+        tone(659, 0.3, 0.048, "sine", now + 0.08);
+        tone(880, 0.34, 0.044, "sine", now + 0.18);
+        tone(1175, 0.36, 0.032, "sine", now + 0.32);
+      } else if (kind === "clear-20") {
+        tone(392, 0.34, 0.05, "sine", now);
+        tone(523, 0.42, 0.05, "sine", now + 0.08);
+        tone(784, 0.48, 0.046, "sine", now + 0.2);
+        tone(1047, 0.52, 0.038, "sine", now + 0.36);
+        tone(1568, 0.46, 0.026, "sine", now + 0.56);
       } else if (kind === "shuffle") {
         tone(330, 0.32, 0.045, "sine", now);
         tone(247, 0.42, 0.04, "sine", now + 0.12);
