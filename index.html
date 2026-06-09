@@ -1025,7 +1025,7 @@
           if (!wild || wild.special !== "wild") continue;
           const wildKey = keyOf({ r, c });
           const cellsByKey = new Map([[wildKey, { r, c }]]);
-          const colorKeys = new Set();
+          const groups = [];
           for (const next of [
             { r: r - 1, c },
             { r: r + 1, c },
@@ -1036,18 +1036,18 @@
             const neighbor = state.board[next.r][next.c];
             if (!neighbor || neighbor.special === "wild") continue;
             const colorGroup = getConnectedGroup(next);
-            if (!colorGroup.length) continue;
+            if (colorGroup.length < minGroup) continue;
+            groups.push(colorGroup);
             for (const pos of colorGroup) {
-              const key = keyOf(pos);
-              cellsByKey.set(key, pos);
-              colorKeys.add(key);
+              cellsByKey.set(keyOf(pos), pos);
             }
           }
-          if (colorKeys.size >= minGroup) {
+          if (groups.length) {
             triggers.push({
               cells: Array.from(cellsByKey.values()),
               wild: { r, c },
-              colorCount: colorKeys.size
+              groups,
+              maxGroupSize: Math.max(...groups.map(group => group.length))
             });
           }
         }
@@ -1402,11 +1402,8 @@
           }
         }
         const anchor = wildTriggers[0].wild;
-        const effectiveCount = wave.reduce((count, pos) => {
-          const cell = state.board[pos.r][pos.c];
-          return cell && cell.special !== "wild" ? count + 1 : count;
-        }, 0);
-        await animateClearWave(wave, anchor, chain, effectiveCount >= wildCreateThreshold, effectiveCount);
+        const maxSingleColorCount = Math.max(...wildTriggers.map(trigger => trigger.maxGroupSize || 0));
+        await animateClearWave(wave, anchor, chain, maxSingleColorCount >= wildCreateThreshold, maxSingleColorCount);
       }
 
       state.combo = chain;
