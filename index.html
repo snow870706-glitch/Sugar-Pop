@@ -9,6 +9,7 @@
       --ink: #5a2d61;
       --panel: rgba(255, 255, 255, 0.78);
       --cell: clamp(32px, 10.6vw, 58px);
+      --app-height: 100svh;
       font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     }
 
@@ -26,7 +27,7 @@
     }
 
     body {
-      min-height: 100dvh;
+      min-height: var(--app-height);
       margin: 0;
       color: var(--ink);
       background:
@@ -52,13 +53,14 @@
       position: relative;
       z-index: 1;
       width: min(100vw, 560px);
-      height: 100dvh;
-      min-height: 100dvh;
+      height: var(--app-height);
+      min-height: var(--app-height);
       margin: 0 auto;
       padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-rows: minmax(112px, auto) minmax(0, 1fr) 46px;
       gap: 8px;
+      overflow: hidden;
     }
 
     .topbar {
@@ -66,6 +68,8 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      min-height: 104px;
+      overflow: hidden;
     }
 
     .brand {
@@ -93,10 +97,12 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(74px, 1fr));
       gap: 6px;
+      align-self: start;
     }
 
     .stat {
       min-width: 0;
+      min-height: 49px;
       padding: 7px 8px;
       border: 2px solid rgba(255, 255, 255, 0.72);
       border-radius: 8px;
@@ -125,12 +131,17 @@
       align-content: center;
       justify-items: center;
       gap: 8px;
+      overflow: visible;
     }
 
     .board {
       position: relative;
       width: calc(var(--cell) * 7 + 18px);
       height: calc(var(--cell) * 9 + 18px);
+      min-width: calc(var(--cell) * 7 + 18px);
+      min-height: calc(var(--cell) * 9 + 18px);
+      max-width: calc(var(--cell) * 7 + 18px);
+      max-height: calc(var(--cell) * 9 + 18px);
       padding: 9px;
       display: grid;
       grid-template-columns: repeat(7, var(--cell));
@@ -142,6 +153,10 @@
       border: 2px solid rgba(255,255,255,0.86);
       box-shadow: 0 18px 34px rgba(113, 38, 99, 0.22), inset 0 2px 0 rgba(255,255,255,0.85);
       touch-action: manipulation;
+      contain: layout style;
+      isolation: isolate;
+      transform: translateZ(0);
+      will-change: contents;
     }
 
     .cell {
@@ -156,6 +171,7 @@
       cursor: pointer;
       touch-action: manipulation;
       transition: transform 160ms ease, background 160ms ease;
+      contain: layout style;
     }
 
     .cell:active { transform: scale(0.94); }
@@ -348,6 +364,18 @@
       background: rgba(199, 255, 219, 0.72);
     }
 
+    .ladder-step.charging {
+      animation: ladder-charge 760ms ease-in-out infinite;
+    }
+
+    .ladder-step.success {
+      animation: ladder-success 640ms ease both;
+    }
+
+    .ladder-step.fail {
+      animation: ladder-fail 620ms ease both;
+    }
+
     .bonus-actions {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -420,6 +448,10 @@
 
     .stat.fragment-pulse {
       animation: fragment-bank-pulse 420ms ease both;
+    }
+
+    .stat.fragment-charge {
+      animation: fragment-charge 980ms ease-in-out both;
     }
 
     .clear-burst {
@@ -595,6 +627,31 @@
       45% { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(255, 214, 46, 0.38), 0 12px 28px rgba(150, 58, 113, 0.22), inset 0 1px 0 rgba(255,255,255,0.9); }
     }
 
+    @keyframes fragment-charge {
+      0% { transform: scale(1); filter: brightness(1); }
+      30% { transform: scale(1.05); filter: brightness(1.28); box-shadow: 0 0 0 5px rgba(255, 214, 46, 0.32), 0 0 30px rgba(255, 184, 46, 0.42), inset 0 1px 0 rgba(255,255,255,0.9); }
+      70% { transform: scale(1.08); filter: brightness(1.45); box-shadow: 0 0 0 8px rgba(255, 214, 46, 0.16), 0 0 42px rgba(255, 68, 145, 0.42), inset 0 1px 0 rgba(255,255,255,0.95); }
+      100% { transform: scale(1); filter: brightness(1); }
+    }
+
+    @keyframes ladder-charge {
+      0%, 100% { filter: brightness(1); transform: scale(1); }
+      50% { filter: brightness(1.36); transform: scale(1.025); box-shadow: 0 0 28px rgba(255, 214, 46, 0.56); }
+    }
+
+    @keyframes ladder-success {
+      0% { transform: scale(1); filter: brightness(1); }
+      35% { transform: scale(1.06); filter: brightness(1.55); box-shadow: 0 0 32px rgba(76, 255, 158, 0.72); }
+      100% { transform: scale(1); filter: brightness(1.05); }
+    }
+
+    @keyframes ladder-fail {
+      0% { transform: scale(1) rotate(0deg); filter: brightness(1); }
+      20% { transform: scale(1.05) rotate(-1deg); filter: brightness(1.5); }
+      42% { transform: scale(0.95) rotate(2deg); filter: brightness(0.75) saturate(0.7); box-shadow: 0 0 34px rgba(255, 61, 137, 0.62); }
+      100% { transform: scale(1) rotate(0deg); filter: brightness(0.95); }
+    }
+
     @keyframes wild-idle {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.08); }
@@ -607,7 +664,8 @@
 
     @media (max-height: 760px) {
       :root { --cell: clamp(31px, 10.1vw, 50px); }
-      .app { gap: 6px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .app { gap: 6px; grid-template-rows: minmax(98px, auto) minmax(0, 1fr) 42px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .topbar { min-height: 92px; }
       .brand-title { font-size: clamp(22px, 7vw, 34px); }
       .brand-sub { display: none; }
       .stat { padding: 7px 9px; }
@@ -696,7 +754,7 @@
       fragmentTarget: 10,
       fragmentAwards: { 6: 1, 10: 2, 20: 5 },
       bonusMultipliers: [5, 10, 20, 50, 100],
-      bonusSuccessRates: [0.93, 0.8, 0.65, 0.45, 0.3],
+      bonusSuccessRates: [0.93, 0.8, 0.65, 0.454, 0.3],
       consolationMultiplier: 0
     };
 
@@ -776,7 +834,32 @@
     }
 
     function makeCell(type = randomCandy(), special = null) {
-      return { type, special };
+      return normalizeCell({ type, special }) || { type: randomCandy(), special: null };
+    }
+
+    function makeWildCell() {
+      return { type: 5, special: "wild" };
+    }
+
+    function isOrdinaryCell(cell) {
+      return !!cell && !cell.special && Number.isInteger(cell.type) && cell.type >= 0 && cell.type < candyTypes;
+    }
+
+    function normalizeCell(cell) {
+      if (!cell) return null;
+      if (cell.special === "wild") return makeWildCell();
+      if (Number.isInteger(cell.type) && cell.type >= 0 && cell.type < candyTypes) {
+        return { type: cell.type, special: null };
+      }
+      return { type: randomCandy(), special: null };
+    }
+
+    function normalizeBoard() {
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
+          state.board[r][c] = normalizeCell(state.board[r][c]);
+        }
+      }
     }
 
     function biasedRefillCandy(r, c) {
@@ -790,7 +873,7 @@
       ]) {
         if (!inBounds(next.r, next.c)) continue;
         const cell = state.board[next.r][next.c];
-        if (cell) options.push(cell.type);
+        if (isOrdinaryCell(cell)) options.push(cell.type);
       }
       if (!options.length) return randomCandy();
       return options[Math.floor(Math.random() * options.length)];
@@ -852,6 +935,7 @@
     }
 
     function render() {
+      normalizeBoard();
       els.board.innerHTML = "";
       els.board.classList.toggle("reshuffling", state.reshuffling);
       els.board.classList.toggle("spawning", state.spawning);
@@ -874,7 +958,7 @@
           if (state.hint.some(pos => pos.r === r && pos.c === c)) button.classList.add("hint");
           if (cell) {
             const candy = document.createElement("div");
-            candy.className = cell.special === "wild" ? "candy special-wild" : `candy type-${cell.type}`;
+            candy.className = cell.special === "wild" ? "candy special-wild" : `candy type-${isOrdinaryCell(cell) ? cell.type : 0}`;
             button.appendChild(candy);
           }
           els.board.appendChild(button);
@@ -1026,6 +1110,7 @@
           const wildKey = keyOf({ r, c });
           const cellsByKey = new Map([[wildKey, { r, c }]]);
           const groups = [];
+          const groupSigs = new Set();
           for (const next of [
             { r: r - 1, c },
             { r: r + 1, c },
@@ -1036,7 +1121,10 @@
             const neighbor = state.board[next.r][next.c];
             if (!neighbor || neighbor.special === "wild") continue;
             const colorGroup = getConnectedGroup(next);
-            if (colorGroup.length < minGroup) continue;
+            if (colorGroup.length + 1 < minGroup) continue;
+            const sig = colorGroup.map(keyOf).sort().join("|");
+            if (groupSigs.has(sig)) continue;
+            groupSigs.add(sig);
             groups.push(colorGroup);
             for (const pos of colorGroup) {
               cellsByKey.set(keyOf(pos), pos);
@@ -1047,7 +1135,7 @@
               cells: Array.from(cellsByKey.values()),
               wild: { r, c },
               groups,
-              maxGroupSize: Math.max(...groups.map(group => group.length))
+              maxEffectiveSize: Math.max(...groups.map(group => group.length + 1))
             });
           }
         }
@@ -1081,6 +1169,7 @@
           }
         }
       }
+      normalizeBoard();
       return filled;
     }
 
@@ -1180,6 +1269,17 @@
       playSound("claim");
     }
 
+    async function animateFragmentCharge() {
+      const stat = els.fragments.closest(".stat");
+      if (!stat) return;
+      stat.classList.remove("fragment-charge");
+      void stat.offsetWidth;
+      stat.classList.add("fragment-charge");
+      playSound("wild");
+      await wait(980);
+      stat.classList.remove("fragment-charge");
+    }
+
     function clearTier(count) {
       if (count >= 20) return 20;
       if (count >= 10) return 10;
@@ -1235,6 +1335,35 @@
       return tier;
     }
 
+    function pickWildSpawnPosition(group, preferredAnchor) {
+      const candidates = group.filter(pos => {
+        const cell = state.board[pos.r]?.[pos.c];
+        return isOrdinaryCell(cell);
+      });
+      if (!candidates.length) {
+        return preferredAnchor && inBounds(preferredAnchor.r, preferredAnchor.c) ? preferredAnchor : group[0];
+      }
+      const center = candidates.reduce((sum, pos) => ({
+        r: sum.r + pos.r,
+        c: sum.c + pos.c
+      }), { r: 0, c: 0 });
+      center.r /= candidates.length;
+      center.c /= candidates.length;
+      const weighted = candidates.map(pos => {
+        const distance = Math.hypot(pos.r - center.r, pos.c - center.c);
+        return {
+          pos,
+          weight: 1 / Math.pow(distance + 0.75, 2)
+        };
+      });
+      let roll = Math.random() * weighted.reduce((sum, item) => sum + item.weight, 0);
+      for (const item of weighted) {
+        roll -= item.weight;
+        if (roll <= 0) return item.pos;
+      }
+      return weighted[weighted.length - 1].pos;
+    }
+
     async function collectFragments(tier, anchor) {
       const fragments = fragmentsForTier(tier);
       if (!fragments) return 0;
@@ -1245,8 +1374,10 @@
       return fragments;
     }
 
-    function maybeOpenBonus() {
+    async function maybeOpenBonus() {
       if (walletState.fragments < mathConfig.fragmentTarget || roundState.bonusPending) return false;
+      updateUI();
+      await animateFragmentCharge();
       walletState.fragments -= mathConfig.fragmentTarget;
       roundState.bonusPending = true;
       roundState.bonusStep = 0;
@@ -1273,6 +1404,19 @@
       els.gambleBonus.disabled = roundState.bonusStep >= mathConfig.bonusMultipliers.length - 1;
     }
 
+    async function animateLadderResult(kind) {
+      const active = els.ladder.querySelector(".ladder-step.active");
+      if (!active) return;
+      active.classList.add("charging");
+      playSound("wild");
+      await wait(760);
+      active.classList.remove("charging");
+      active.classList.add(kind);
+      playSound(kind === "success" ? "clear-10" : "invalid");
+      await wait(620);
+      active.classList.remove(kind);
+    }
+
     function closeBonus() {
       roundState.bonusPending = false;
       roundState.bonusStep = 0;
@@ -1285,7 +1429,7 @@
     }
 
     function collectBonus() {
-      if (!roundState.bonusPending) return;
+      if (!roundState.bonusPending || state.busy) return;
       const win = roundState.bonusOffer || (roundState.bonusSeed || walletState.bet) * mathConfig.consolationMultiplier;
       walletState.roundWin += win;
       walletState.totalWin += win;
@@ -1298,11 +1442,14 @@
     async function gambleBonus() {
       if (!roundState.bonusPending || state.busy) return;
       state.busy = true;
+      els.collectBonus.disabled = true;
+      els.gambleBonus.disabled = true;
       const step = roundState.bonusStep;
       const successRate = mathConfig.bonusSuccessRates[Math.min(step, mathConfig.bonusSuccessRates.length - 1)];
       nextActionMeta();
-      await wait(260);
-      if (Math.random() < successRate) {
+      const success = Math.random() < successRate;
+      await animateLadderResult(success ? "success" : "fail");
+      if (success) {
         roundState.bonusStep = Math.min(roundState.bonusStep + 1, mathConfig.bonusMultipliers.length - 1);
         renderBonus();
         setToast(`階梯升級！目前 x${mathConfig.bonusMultipliers[roundState.bonusStep]}。`);
@@ -1317,6 +1464,7 @@
         closeBonus();
       }
       state.busy = false;
+      els.collectBonus.disabled = false;
       updateUI();
     }
 
@@ -1336,14 +1484,16 @@
       await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
       await collectFragments(tier, anchor);
 
-      const clickedKey = clicked ? keyOf(clicked) : "";
+      const wildSpawn = createWild ? pickWildSpawnPosition(group, anchor) : null;
+      const wildSpawnKey = wildSpawn ? keyOf(wildSpawn) : "";
       for (const pos of group) {
-        if (createWild && keyOf(pos) === clickedKey) {
-          state.board[pos.r][pos.c] = makeCell(null, "wild");
+        if (createWild && keyOf(pos) === wildSpawnKey) {
+          state.board[pos.r][pos.c] = makeWildCell();
         } else {
           state.board[pos.r][pos.c] = null;
         }
       }
+      normalizeBoard();
       state.clearing.clear();
       state.popups = [];
       state.bursts = [];
@@ -1402,7 +1552,7 @@
           }
         }
         const anchor = wildTriggers[0].wild;
-        const maxSingleColorCount = Math.max(...wildTriggers.map(trigger => trigger.maxGroupSize || 0));
+        const maxSingleColorCount = Math.max(...wildTriggers.map(trigger => trigger.maxEffectiveSize || 0));
         await animateClearWave(wave, anchor, chain, maxSingleColorCount >= wildCreateThreshold, maxSingleColorCount);
       }
 
@@ -1420,7 +1570,7 @@
       if (walletState.fragments >= mathConfig.fragmentTarget) {
         await wait(260);
       }
-      if (maybeOpenBonus()) {
+      if (await maybeOpenBonus()) {
         state.busy = false;
         updateUI();
         render();
