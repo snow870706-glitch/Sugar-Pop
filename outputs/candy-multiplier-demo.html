@@ -390,6 +390,38 @@
 
     .score-pop.combo { background: linear-gradient(135deg, #7d42ff, #1cc5f3); }
 
+    .fragment-flight {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 80;
+      width: 18px;
+      height: 18px;
+      border-radius: 45% 55% 48% 52%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,0.95) 0 18%, transparent 19%),
+        linear-gradient(135deg, #fff48d, #ffb82e 55%, #ff6d2e);
+      box-shadow: 0 0 12px rgba(255, 222, 66, 0.9), 0 7px 14px rgba(112, 46, 76, 0.22);
+      transform: translate(var(--sx), var(--sy)) scale(0.62) rotate(0deg);
+      animation: fragment-fly 720ms cubic-bezier(.18, .86, .22, 1) forwards;
+      animation-delay: var(--delay);
+    }
+
+    .fragment-flight::after {
+      content: "";
+      position: absolute;
+      inset: -7px;
+      border-radius: inherit;
+      background: radial-gradient(circle, rgba(255,255,255,0.72), transparent 58%);
+      opacity: 0.75;
+      z-index: -1;
+    }
+
+    .stat.fragment-pulse {
+      animation: fragment-bank-pulse 420ms ease both;
+    }
+
     .clear-burst {
       position: absolute;
       left: calc(9px + var(--c) * var(--cell) + var(--cell) * 0.5);
@@ -551,6 +583,18 @@
       100% { opacity: 0; transform: translate(calc(var(--dx) * var(--cell)), calc(var(--dy) * var(--cell))) scale(1) rotate(calc(var(--rot) + 260deg)); }
     }
 
+    @keyframes fragment-fly {
+      0% { opacity: 0; transform: translate(var(--sx), var(--sy)) scale(0.55) rotate(-25deg); filter: brightness(1.25); }
+      18% { opacity: 1; transform: translate(calc(var(--sx) + var(--arc-x)), calc(var(--sy) - 34px)) scale(1.05) rotate(45deg); }
+      72% { opacity: 1; transform: translate(var(--mx), calc(var(--ty) - 46px)) scale(0.92) rotate(190deg); }
+      100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.28) rotate(360deg); filter: brightness(1.45); }
+    }
+
+    @keyframes fragment-bank-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 10px 24px rgba(150, 58, 113, 0.12), inset 0 1px 0 rgba(255,255,255,0.82); }
+      45% { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(255, 214, 46, 0.38), 0 12px 28px rgba(150, 58, 113, 0.22), inset 0 1px 0 rgba(255,255,255,0.9); }
+    }
+
     @keyframes wild-idle {
       0%, 100% { transform: scale(1); }
       50% { transform: scale(1.08); }
@@ -643,7 +687,7 @@
     const candyTypes = 5;
     const refillNeighborBias = 0.25;
     const minGroup = 3;
-    const wildCreateThreshold = 10;
+    const wildCreateThreshold = 6;
     const mathConfig = {
       initialCredits: 1000,
       minBet: 10,
@@ -652,8 +696,8 @@
       fragmentTarget: 10,
       fragmentAwards: { 6: 1, 10: 2, 20: 5 },
       bonusMultipliers: [5, 10, 20, 50, 100],
-      bonusSuccessRates: [0.93, 0.8, 0.65, 0.48, 0.3],
-      consolationMultiplier: 1
+      bonusSuccessRates: [0.93, 0.8, 0.65, 0.45, 0.3],
+      consolationMultiplier: 0
     };
 
     const state = {
@@ -671,7 +715,8 @@
       bursts: [],
       hintTimer: null,
       audio: null,
-      musicTimer: null
+      musicTimer: null,
+      fragmentFlights: 0
     };
 
     const walletState = {
@@ -772,7 +817,7 @@
       els.bet.textContent = money(walletState.bet);
       els.totalWin.textContent = money(walletState.totalWin);
       els.roundWin.textContent = money(walletState.roundWin);
-      els.fragments.textContent = `${walletState.fragments}/${mathConfig.fragmentTarget}`;
+      els.fragments.textContent = `${Math.min(walletState.fragments, mathConfig.fragmentTarget)}/${mathConfig.fragmentTarget}`;
       els.chain.textContent = `x${comboMultiplier().toFixed(1)}`;
       els.betDown.disabled = state.busy || walletState.bet <= mathConfig.minBet;
       els.betUp.disabled = state.busy || walletState.bet >= mathConfig.maxBet || walletState.bet + mathConfig.betStep > walletState.credits;
@@ -974,14 +1019,13 @@
 
     function findWildTriggers() {
       const triggers = [];
-      const usedWilds = new Set();
       for (let r = 0; r < rows; r += 1) {
         for (let c = 0; c < cols; c += 1) {
           const wild = state.board[r][c];
           if (!wild || wild.special !== "wild") continue;
           const wildKey = keyOf({ r, c });
-          if (usedWilds.has(wildKey)) continue;
-          let best = null;
+          const cellsByKey = new Map([[wildKey, { r, c }]]);
+          const colorKeys = new Set();
           for (const next of [
             { r: r - 1, c },
             { r: r + 1, c },
@@ -992,14 +1036,19 @@
             const neighbor = state.board[next.r][next.c];
             if (!neighbor || neighbor.special === "wild") continue;
             const colorGroup = getConnectedGroup(next);
-            const group = [{ r, c }, ...colorGroup.filter(pos => pos.r !== r || pos.c !== c)];
-            if (group.length >= minGroup && (!best || group.length > best.cells.length)) {
-              best = { cells: group, clicked: { r, c }, wild: { r, c }, type: neighbor.type };
+            if (!colorGroup.length) continue;
+            for (const pos of colorGroup) {
+              const key = keyOf(pos);
+              cellsByKey.set(key, pos);
+              colorKeys.add(key);
             }
           }
-          if (best) {
-            triggers.push(best);
-            usedWilds.add(wildKey);
+          if (colorKeys.size >= minGroup) {
+            triggers.push({
+              cells: Array.from(cellsByKey.values()),
+              wild: { r, c },
+              colorCount: colorKeys.size
+            });
           }
         }
       }
@@ -1077,6 +1126,60 @@
       });
     }
 
+    function boardPoint(anchor) {
+      const rect = els.board.getBoundingClientRect();
+      const cell = rect.width / cols;
+      return {
+        x: rect.left + cell * (anchor.c + 0.5),
+        y: rect.top + cell * (anchor.r + 0.5)
+      };
+    }
+
+    function fragmentTargetPoint() {
+      const rect = els.fragments.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width * 0.5,
+        y: rect.top + rect.height * 0.5
+      };
+    }
+
+    async function flyFragments(anchor, count) {
+      if (!count) return;
+      const start = boardPoint(anchor);
+      const target = fragmentTargetPoint();
+      const flights = [];
+      state.fragmentFlights += count;
+      for (let i = 0; i < count; i += 1) {
+        const chip = document.createElement("div");
+        chip.className = "fragment-flight";
+        const offsetX = (i - (count - 1) / 2) * 9;
+        const offsetY = (i % 2) * -7;
+        chip.style.setProperty("--sx", `${start.x + offsetX}px`);
+        chip.style.setProperty("--sy", `${start.y + offsetY}px`);
+        chip.style.setProperty("--tx", `${target.x}px`);
+        chip.style.setProperty("--ty", `${target.y}px`);
+        chip.style.setProperty("--mx", `${(start.x + target.x) / 2 + (i - 1) * 10}px`);
+        chip.style.setProperty("--arc-x", `${(i - (count - 1) / 2) * 18}px`);
+        chip.style.setProperty("--delay", `${i * 82}ms`);
+        document.body.appendChild(chip);
+        flights.push(new Promise(resolve => {
+          chip.addEventListener("animationend", () => {
+            chip.remove();
+            resolve();
+          }, { once: true });
+        }));
+      }
+      await Promise.all(flights);
+      state.fragmentFlights = Math.max(0, state.fragmentFlights - count);
+      const stat = els.fragments.closest(".stat");
+      if (stat) {
+        stat.classList.remove("fragment-pulse");
+        void stat.offsetWidth;
+        stat.classList.add("fragment-pulse");
+      }
+      playSound("claim");
+    }
+
     function clearTier(count) {
       if (count >= 20) return 20;
       if (count >= 10) return 10;
@@ -1112,8 +1215,7 @@
       });
     }
 
-    function showClearBurst(group, anchor) {
-      const tier = clearTier(group.length);
+    function showClearBurst(group, anchor, tier = clearTier(group.length)) {
       if (!tier) return 0;
       const bounds = group.reduce((box, pos) => ({
         minR: Math.min(box.minR, pos.r),
@@ -1133,11 +1235,13 @@
       return tier;
     }
 
-    function awardFragments(tier) {
+    async function collectFragments(tier, anchor) {
       const fragments = fragmentsForTier(tier);
       if (!fragments) return 0;
+      await flyFragments(anchor, fragments);
       walletState.fragments += fragments;
       roundState.baseFragments += fragments;
+      updateUI();
       return fragments;
     }
 
@@ -1150,7 +1254,7 @@
       roundState.bonusOffer = roundState.bonusSeed * mathConfig.bonusMultipliers[0];
       renderBonus();
       els.bonusOverlay.classList.add("open");
-      setToast("Jackpot Chase！收下保底或繼續挑戰。");
+      setToast("Jackpot Chase！收下目前獎金或繼續挑戰。");
       playSound("clear-20");
       return true;
     }
@@ -1165,7 +1269,7 @@
       });
       const currentMultiplier = mathConfig.bonusMultipliers[Math.min(roundState.bonusStep, mathConfig.bonusMultipliers.length - 1)];
       roundState.bonusOffer = (roundState.bonusSeed || walletState.bet) * currentMultiplier;
-      els.bonusSub.textContent = `目前可收下 ${money(roundState.bonusOffer)} credits。繼續挑戰可能升級，也可能只拿保底。`;
+      els.bonusSub.textContent = `目前可收下 ${money(roundState.bonusOffer)} credits。繼續挑戰可能升級，也可能挑戰失敗歸零。`;
       els.gambleBonus.disabled = roundState.bonusStep >= mathConfig.bonusMultipliers.length - 1;
     }
 
@@ -1208,7 +1312,7 @@
         walletState.roundWin += win;
         walletState.totalWin += win;
         walletState.credits += win;
-        setToast(`挑戰失敗，保底 +${money(win)} credits。`);
+        setToast(`挑戰失敗，Bonus +${money(win)} credits。`);
         playSound("invalid");
         closeBonus();
       }
@@ -1216,21 +1320,21 @@
       updateUI();
     }
 
-    async function animateClearWave(group, clicked, comboWaves, createWild) {
+    async function animateClearWave(group, clicked, comboWaves, createWild, effectiveCount = group.length) {
       const anchor = groupAnchor(group, clicked);
       state.combo = comboWaves;
       state.clearing = new Set(group.map(keyOf));
-      const tier = showClearBurst(group, anchor);
-      const fragments = awardFragments(tier);
+      const tier = showClearBurst(group, anchor, clearTier(effectiveCount));
+      const fragments = fragmentsForTier(tier);
       if (fragments) showScorePopup(anchor, `+${fragments} Frag`, comboWaves);
-      updateUI();
       render();
-      const specialMessage = tierMessage(tier, group.length);
-      const comboText = comboWaves ? `Combo ${comboWaves}！` : "";
-      setToast(createWild ? "百搭糖果形成！落定後會嘗試連爆。" : fragments ? `${specialMessage || comboText} +${fragments} Jackpot 碎片` : `${comboText}普通消去不派彩。`);
+      const specialMessage = tierMessage(tier, effectiveCount);
+      const comboText = comboWaves ? `Chain ${comboWaves}！` : "";
+      setToast(createWild ? "百搭糖果形成！碎片正在收集。" : fragments ? `${specialMessage || comboText} +${fragments} Jackpot 碎片` : `${comboText}普通消去不派彩。`);
       playSound(tier ? `clear-${tier}` : comboWaves ? "combo" : "clear");
       if (createWild) playSound("wild");
       await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
+      await collectFragments(tier, anchor);
 
       const clickedKey = clicked ? keyOf(clicked) : "";
       for (const pos of group) {
@@ -1276,6 +1380,7 @@
       roundState.chainCount = 0;
       roundState.baseFragments = 0;
       state.combo = 0;
+      updateUI();
 
       await animateClearWave(group, clicked, 0, group.length >= wildCreateThreshold);
 
@@ -1297,7 +1402,11 @@
           }
         }
         const anchor = wildTriggers[0].wild;
-        await animateClearWave(wave, anchor, chain, false);
+        const effectiveCount = wave.reduce((count, pos) => {
+          const cell = state.board[pos.r][pos.c];
+          return cell && cell.special !== "wild" ? count + 1 : count;
+        }, 0);
+        await animateClearWave(wave, anchor, chain, effectiveCount >= wildCreateThreshold, effectiveCount);
       }
 
       state.combo = chain;
@@ -1311,6 +1420,9 @@
         state.popups = [];
       }
 
+      if (walletState.fragments >= mathConfig.fragmentTarget) {
+        await wait(260);
+      }
       if (maybeOpenBonus()) {
         state.busy = false;
         updateUI();

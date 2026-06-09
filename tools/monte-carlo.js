@@ -14,15 +14,33 @@ const clearDistribution = [
   { tier: 20, weight: 0.01 }
 ];
 
-const totalWeight = clearDistribution.reduce((sum, item) => sum + item.weight, 0);
+const chainWaveDistribution = [
+  { tier: 0, weight: 0.58 },
+  { tier: 6, weight: 0.31 },
+  { tier: 10, weight: 0.09 },
+  { tier: 20, weight: 0.02 }
+];
+
+const wildCreateThreshold = 6;
+const firstChainChance = 0.22;
+const chainDecay = 0.52;
 
 function pickTier() {
+  return pickWeighted(clearDistribution);
+}
+
+function pickChainTier() {
+  return pickWeighted(chainWaveDistribution);
+}
+
+function pickWeighted(distribution) {
+  const totalWeight = distribution.reduce((sum, item) => sum + item.weight, 0);
   let roll = Math.random() * totalWeight;
-  for (const item of clearDistribution) {
+  for (const item of distribution) {
     roll -= item.weight;
     if (roll <= 0) return item.tier;
   }
-  return clearDistribution[clearDistribution.length - 1].tier;
+  return distribution[distribution.length - 1].tier;
 }
 
 function fragmentsForTier(tier) {
@@ -56,6 +74,15 @@ for (let i = 0; i < actions; i += 1) {
   totalBet += bet;
   const tier = pickTier();
   fragments += fragmentsForTier(tier);
+  if (tier >= wildCreateThreshold) {
+    let chainChance = firstChainChance;
+    for (let chain = 0; chain < 12 && Math.random() < chainChance; chain += 1) {
+      const chainTier = pickChainTier();
+      fragments += fragmentsForTier(chainTier);
+      if (chainTier < wildCreateThreshold) break;
+      chainChance *= chainDecay;
+    }
+  }
   let actionWin = 0;
 
   while (fragments >= config.fragmentTarget) {
@@ -79,7 +106,10 @@ const report = {
   totalWin,
   maxActionWin,
   remainingFragments: fragments,
-  clearDistribution
+  clearDistribution,
+  chainWaveDistribution,
+  firstChainChance,
+  chainDecay
 };
 
 console.log(JSON.stringify(report, null, 2));
