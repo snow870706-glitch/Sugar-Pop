@@ -58,7 +58,7 @@
       margin: 0 auto;
       padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-rows: 58px minmax(0, 1fr) 70px;
+      grid-template-rows: 46px minmax(0, 1fr) 70px;
       gap: 6px;
       overflow: hidden;
     }
@@ -67,21 +67,21 @@
       display: grid;
       align-items: center;
       gap: 6px;
-      min-height: 58px;
+      min-height: 46px;
       overflow: hidden;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: 0.9fr 1.1fr;
+      grid-template-columns: 1fr;
       gap: 6px;
       align-self: stretch;
     }
 
     .stat {
       min-width: 0;
-      min-height: 52px;
-      padding: 8px 10px;
+      min-height: 42px;
+      padding: 6px 10px;
       border: 2px solid rgba(255, 255, 255, 0.72);
       border-radius: 8px;
       background: var(--panel);
@@ -97,7 +97,7 @@
 
     .value {
       margin-top: 2px;
-      font-size: 20px;
+      font-size: 19px;
       line-height: 1;
       font-weight: 1000;
       color: #7b2c91;
@@ -627,8 +627,8 @@
 
     @media (max-height: 760px) {
       :root { --cell: clamp(34px, 11.7vw, 58px); }
-      .app { gap: 5px; grid-template-rows: 54px minmax(0, 1fr) 66px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
-      .topbar { min-height: 54px; }
+      .app { gap: 5px; grid-template-rows: 44px minmax(0, 1fr) 66px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .topbar { min-height: 44px; }
       .stat { padding: 7px 9px; }
       .value { font-size: 20px; }
     }
@@ -645,10 +645,6 @@
   <main class="app">
     <header class="topbar">
       <div class="stats">
-        <div class="stat">
-          <div class="label">Combo</div>
-          <div class="value" id="chain">Chain x1.0</div>
-        </div>
         <div class="stat">
           <div class="label">Jackpot Fragments</div>
           <div class="value" id="fragments">0/10</div>
@@ -759,7 +755,6 @@
       bet: document.querySelector("#bet"),
       totalWin: document.querySelector("#totalWin"),
       fragments: document.querySelector("#fragments"),
-      chain: document.querySelector("#chain"),
       toast: null,
       hint: null,
       betDown: document.querySelector("#betDown"),
@@ -864,7 +859,6 @@
       els.bet.textContent = money(walletState.bet);
       els.totalWin.textContent = money(walletState.totalWin);
       els.fragments.textContent = `${formatDecimal(Math.min(walletState.fragments, mathConfig.fragmentTarget))}/${formatDecimal(mathConfig.fragmentTarget)}`;
-      els.chain.textContent = `Chain x${comboMultiplier().toFixed(1)}`;
       const betLocked = state.busy || roundState.bonusPending || state.fragmentFlights > 0;
       els.betDown.disabled = betLocked || walletState.bet <= mathConfig.minBet;
       els.betUp.disabled = betLocked || walletState.bet >= mathConfig.maxBet || walletState.bet + mathConfig.betStep > walletState.credits;
@@ -1256,7 +1250,7 @@
       state.popups.push({
         r: Math.max(0, anchor.r - 0.2),
         c: Math.min(cols - 1, anchor.c + 0.15),
-        text: combo > 0 ? `${text}  x${actionMultiplier(combo).toFixed(1)}` : text,
+        text: combo > 0 && !String(text).startsWith("Combo") ? `${text}  x${actionMultiplier(combo).toFixed(1)}` : text,
         combo: combo > 0
       });
     }
@@ -1538,6 +1532,7 @@
       const tier = showClearBurst(group, anchor, clearTier(effectiveCount));
       const fragments = oneDecimal(fragmentsForTier(tier) * actionMultiplier(comboWaves));
       if (fragments) showScorePopup(anchor, `+${formatDecimal(fragments)} Frag`, comboWaves);
+      if (!fragments && comboWaves) showScorePopup(anchor, `Combo x${actionMultiplier(comboWaves).toFixed(1)}`, comboWaves);
       render();
       const specialMessage = tierMessage(tier, effectiveCount);
       const comboText = comboWaves ? `Chain ${comboWaves}！` : "";
