@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="zh-Hant">
 <head>
   <meta charset="utf-8">
@@ -91,13 +91,13 @@
 
     .stats {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: repeat(3, minmax(74px, 1fr));
+      gap: 6px;
     }
 
     .stat {
-      min-width: 86px;
-      padding: 8px 10px;
+      min-width: 0;
+      padding: 7px 8px;
       border: 2px solid rgba(255, 255, 255, 0.72);
       border-radius: 8px;
       background: var(--panel);
@@ -113,7 +113,7 @@
 
     .value {
       margin-top: 2px;
-      font-size: 22px;
+      font-size: 19px;
       line-height: 1;
       font-weight: 1000;
       color: #7b2c91;
@@ -229,9 +229,29 @@
 
     .controls {
       display: grid;
-      grid-template-columns: 1fr auto;
+      grid-template-columns: auto 1fr auto;
       align-items: center;
       gap: 8px;
+    }
+
+    .bet-controls {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bet-btn {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 19px;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #7d42ff, #1cc5f3);
+      box-shadow: 0 10px 18px rgba(70, 48, 150, 0.22), inset 0 1px 0 rgba(255,255,255,0.38);
+      cursor: pointer;
+      touch-action: manipulation;
     }
 
     .toast {
@@ -259,6 +279,94 @@
       box-shadow: 0 10px 20px rgba(119, 39, 144, 0.24), inset 0 1px 0 rgba(255,255,255,0.42);
       cursor: pointer;
       touch-action: manipulation;
+    }
+
+    .bonus-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: none;
+      place-items: center;
+      padding: 18px;
+      background: rgba(54, 18, 70, 0.62);
+      backdrop-filter: blur(8px);
+    }
+
+    .bonus-overlay.open { display: grid; }
+
+    .bonus-panel {
+      width: min(92vw, 420px);
+      padding: 18px;
+      border-radius: 14px;
+      color: #5a2d61;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,0.95), transparent 35%),
+        linear-gradient(145deg, #fff7d6, #ffc5e4 55%, #b8f0ff);
+      border: 2px solid rgba(255,255,255,0.9);
+      box-shadow: 0 26px 80px rgba(57, 18, 78, 0.42);
+    }
+
+    .bonus-title {
+      font-size: 24px;
+      font-weight: 1000;
+      color: #ff337f;
+      text-shadow: 0 2px 0 #fff;
+    }
+
+    .bonus-sub {
+      margin: 5px 0 12px;
+      font-size: 13px;
+      font-weight: 900;
+      color: rgba(90, 45, 97, 0.78);
+    }
+
+    .ladder {
+      display: grid;
+      gap: 7px;
+      margin: 12px 0;
+    }
+
+    .ladder-step {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 9px 11px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.58);
+      border: 2px solid rgba(255,255,255,0.62);
+      font-weight: 1000;
+    }
+
+    .ladder-step.active {
+      color: #fff;
+      background: linear-gradient(135deg, #ff3c82, #7d42ff);
+      box-shadow: 0 8px 24px rgba(126, 42, 144, 0.3);
+    }
+
+    .ladder-step.cleared {
+      color: #18834d;
+      background: rgba(199, 255, 219, 0.72);
+    }
+
+    .bonus-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .bonus-btn {
+      height: 42px;
+      border: 0;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 1000;
+      background: linear-gradient(135deg, #ff4b93, #ffb82e);
+      box-shadow: 0 10px 20px rgba(119, 39, 144, 0.2), inset 0 1px 0 rgba(255,255,255,0.42);
+      cursor: pointer;
+    }
+
+    .bonus-btn.secondary {
+      background: linear-gradient(135deg, #7d42ff, #1cc5f3);
     }
 
     .score-pop {
@@ -474,16 +582,32 @@
     <header class="topbar">
       <div class="brand">
         <div class="brand-title">Sugar Pop</div>
-        <div class="brand-sub">點擊 3 顆以上相連糖果</div>
+        <div class="brand-sub">封閉測試錢包 - Jackpot Chase</div>
       </div>
       <div class="stats">
         <div class="stat">
-          <div class="label">Score</div>
-          <div class="value" id="score">0</div>
+          <div class="label">Credits</div>
+          <div class="value" id="credits">1,000</div>
         </div>
         <div class="stat">
-          <div class="label">Combo</div>
-          <div class="value" id="combo">x1.0</div>
+          <div class="label">Bet</div>
+          <div class="value" id="bet">10</div>
+        </div>
+        <div class="stat">
+          <div class="label">Total Win</div>
+          <div class="value" id="totalWin">0</div>
+        </div>
+        <div class="stat">
+          <div class="label">Round Win</div>
+          <div class="value" id="roundWin">0</div>
+        </div>
+        <div class="stat">
+        <div class="label">Jackpot Fragments</div>
+          <div class="value" id="fragments">0/10</div>
+        </div>
+        <div class="stat">
+          <div class="label">Chain</div>
+          <div class="value" id="chain">x1.0</div>
         </div>
       </div>
     </header>
@@ -493,11 +617,26 @@
     </section>
 
     <section class="controls">
-      <div class="toast" id="toast">點擊 3 顆以上相連的同色糖果。</div>
+      <div class="bet-controls">
+        <button class="bet-btn" id="betDown" type="button" aria-label="decrease bet">-</button>
+        <button class="bet-btn" id="betUp" type="button" aria-label="increase bet">+</button>
+      </div>
+      <div class="toast" id="toast">普通消去不派彩，收集 Jackpot 碎片進入階梯挑戰。</div>
       <button class="hint-btn" id="hint" type="button">提示</button>
     </section>
   </main>
 
+  <section class="bonus-overlay" id="bonusOverlay" aria-label="Jackpot Chase Bonus">
+    <div class="bonus-panel">
+      <div class="bonus-title">Jackpot Chase</div>
+      <div class="bonus-sub" id="bonusSub">選擇收下目前獎金，或繼續挑戰下一層。</div>
+      <div class="ladder" id="ladder"></div>
+      <div class="bonus-actions">
+        <button class="bonus-btn secondary" id="collectBonus" type="button">收下</button>
+        <button class="bonus-btn" id="gambleBonus" type="button">繼續挑戰</button>
+      </div>
+    </div>
+  </section>
   <script>
     const cols = 7;
     const rows = 9;
@@ -505,10 +644,20 @@
     const refillNeighborBias = 0.25;
     const minGroup = 3;
     const wildCreateThreshold = 10;
+    const mathConfig = {
+      initialCredits: 1000,
+      minBet: 10,
+      maxBet: 100,
+      betStep: 10,
+      fragmentTarget: 10,
+      fragmentAwards: { 6: 1, 10: 2, 20: 5 },
+      bonusMultipliers: [5, 10, 20, 50, 100],
+      bonusSuccessRates: [0.93, 0.8, 0.65, 0.48, 0.3],
+      consolationMultiplier: 1
+    };
 
     const state = {
       board: [],
-      score: 0,
       combo: 0,
       busy: false,
       hint: [],
@@ -525,12 +674,43 @@
       musicTimer: null
     };
 
+    const walletState = {
+      credits: mathConfig.initialCredits,
+      bet: 10,
+      totalWin: 0,
+      roundWin: 0,
+      fragments: 0
+    };
+
+    const roundState = {
+      actionId: 0,
+      chainCount: 0,
+      baseFragments: 0,
+      bonusPending: false,
+      bonusStep: 0,
+      bonusOffer: 0,
+      bonusSeed: 0,
+      rngNonce: 0,
+      boardHash: ""
+    };
+
     const els = {
       board: document.querySelector("#board"),
-      score: document.querySelector("#score"),
-      combo: document.querySelector("#combo"),
+      credits: document.querySelector("#credits"),
+      bet: document.querySelector("#bet"),
+      totalWin: document.querySelector("#totalWin"),
+      roundWin: document.querySelector("#roundWin"),
+      fragments: document.querySelector("#fragments"),
+      chain: document.querySelector("#chain"),
       toast: document.querySelector("#toast"),
-      hint: document.querySelector("#hint")
+      hint: document.querySelector("#hint"),
+      betDown: document.querySelector("#betDown"),
+      betUp: document.querySelector("#betUp"),
+      bonusOverlay: document.querySelector("#bonusOverlay"),
+      bonusSub: document.querySelector("#bonusSub"),
+      ladder: document.querySelector("#ladder"),
+      collectBonus: document.querySelector("#collectBonus"),
+      gambleBonus: document.querySelector("#gambleBonus")
     };
 
     function keyOf(pos) {
@@ -579,13 +759,51 @@
       return Math.round(value).toLocaleString("en-US");
     }
 
+    function money(value) {
+      return Math.round(value).toLocaleString("en-US");
+    }
+
     function setToast(text) {
       els.toast.textContent = text;
     }
 
     function updateUI() {
-      els.score.textContent = formatScore(state.score);
-      els.combo.textContent = `x${comboMultiplier().toFixed(1)}`;
+      els.credits.textContent = money(walletState.credits);
+      els.bet.textContent = money(walletState.bet);
+      els.totalWin.textContent = money(walletState.totalWin);
+      els.roundWin.textContent = money(walletState.roundWin);
+      els.fragments.textContent = `${walletState.fragments}/${mathConfig.fragmentTarget}`;
+      els.chain.textContent = `x${comboMultiplier().toFixed(1)}`;
+      els.betDown.disabled = state.busy || walletState.bet <= mathConfig.minBet;
+      els.betUp.disabled = state.busy || walletState.bet >= mathConfig.maxBet || walletState.bet + mathConfig.betStep > walletState.credits;
+    }
+
+    function boardHash() {
+      let hash = 2166136261;
+      const text = state.board.map(row => row.map(cell => cell ? `${cell.type}:${cell.special || ""}` : "x").join("|")).join("/");
+      for (let i = 0; i < text.length; i += 1) {
+        hash ^= text.charCodeAt(i);
+        hash = Math.imul(hash, 16777619);
+      }
+      return (hash >>> 0).toString(16);
+    }
+
+    function nextActionMeta() {
+      roundState.actionId += 1;
+      roundState.rngNonce = Math.floor(Math.random() * 1e9);
+      roundState.boardHash = boardHash();
+      return {
+        actionId: roundState.actionId,
+        rngNonce: roundState.rngNonce,
+        boardHash: roundState.boardHash
+      };
+    }
+
+    function changeBet(delta) {
+      if (state.busy || roundState.bonusPending) return;
+      const next = Math.max(mathConfig.minBet, Math.min(mathConfig.maxBet, walletState.bet + delta));
+      walletState.bet = Math.min(next, Math.max(mathConfig.minBet, walletState.credits));
+      updateUI();
     }
 
     function render() {
@@ -727,23 +945,17 @@
     function showHint() {
       const groups = findClickableGroups();
       if (!groups.length) {
-        setToast("目前沒有可消群組，下一次補牌會修正。");
+        setToast("暫時沒有可消群組，糖果機正在重整。");
         return;
       }
       state.hint = groups[0];
-      setToast(`提示：這一團有 ${groups[0].length} 顆可以消。`);
+      setToast(`提示：這裡有 ${groups[0].length} 顆可消糖果。`);
       render();
       resetIdleHint();
     }
 
     function comboMultiplier() {
       return actionMultiplier(state.combo);
-    }
-
-    function scoreFor(count) {
-      if (count <= 3) return count * 10;
-      if (count === 4) return 48;
-      return Math.round(count * 12 + Math.pow(count - 4, 2) * 12);
     }
 
     function actionMultiplier(comboWaves) {
@@ -856,10 +1068,11 @@
     }
 
     function showScorePopup(anchor, gain, combo) {
+      const text = typeof gain === "number" ? `+${gain}` : gain;
       state.popups.push({
         r: Math.max(0, anchor.r - 0.2),
         c: Math.min(cols - 1, anchor.c + 0.15),
-        text: combo > 0 ? `+${gain}  x${actionMultiplier(combo).toFixed(1)}` : `+${gain}`,
+        text: combo > 0 ? `${text}  x${actionMultiplier(combo).toFixed(1)}` : text,
         combo: combo > 0
       });
     }
@@ -868,6 +1081,13 @@
       if (count >= 20) return 20;
       if (count >= 10) return 10;
       if (count >= 6) return 6;
+      return 0;
+    }
+
+    function fragmentsForTier(tier) {
+      if (tier >= 20) return mathConfig.fragmentAwards[20];
+      if (tier >= 10) return mathConfig.fragmentAwards[10];
+      if (tier >= 6) return mathConfig.fragmentAwards[6];
       return 0;
     }
 
@@ -913,18 +1133,101 @@
       return tier;
     }
 
+    function awardFragments(tier) {
+      const fragments = fragmentsForTier(tier);
+      if (!fragments) return 0;
+      walletState.fragments += fragments;
+      roundState.baseFragments += fragments;
+      return fragments;
+    }
+
+    function maybeOpenBonus() {
+      if (walletState.fragments < mathConfig.fragmentTarget || roundState.bonusPending) return false;
+      walletState.fragments -= mathConfig.fragmentTarget;
+      roundState.bonusPending = true;
+      roundState.bonusStep = 0;
+      roundState.bonusSeed = Math.round(walletState.bet * actionMultiplier(roundState.chainCount));
+      roundState.bonusOffer = roundState.bonusSeed * mathConfig.bonusMultipliers[0];
+      renderBonus();
+      els.bonusOverlay.classList.add("open");
+      setToast("Jackpot Chase！收下保底或繼續挑戰。");
+      playSound("clear-20");
+      return true;
+    }
+
+    function renderBonus() {
+      els.ladder.innerHTML = "";
+      mathConfig.bonusMultipliers.forEach((multiplier, index) => {
+        const step = document.createElement("div");
+        step.className = `ladder-step ${index < roundState.bonusStep ? "cleared" : ""} ${index === roundState.bonusStep ? "active" : ""}`;
+        step.innerHTML = `<span>Level ${index + 1}</span><span>x${multiplier}</span>`;
+        els.ladder.appendChild(step);
+      });
+      const currentMultiplier = mathConfig.bonusMultipliers[Math.min(roundState.bonusStep, mathConfig.bonusMultipliers.length - 1)];
+      roundState.bonusOffer = (roundState.bonusSeed || walletState.bet) * currentMultiplier;
+      els.bonusSub.textContent = `目前可收下 ${money(roundState.bonusOffer)} credits。繼續挑戰可能升級，也可能只拿保底。`;
+      els.gambleBonus.disabled = roundState.bonusStep >= mathConfig.bonusMultipliers.length - 1;
+    }
+
+    function closeBonus() {
+      roundState.bonusPending = false;
+      roundState.bonusStep = 0;
+      roundState.bonusOffer = 0;
+      roundState.bonusSeed = 0;
+      els.bonusOverlay.classList.remove("open");
+      updateUI();
+      render();
+      resetIdleHint();
+    }
+
+    function collectBonus() {
+      if (!roundState.bonusPending) return;
+      const win = roundState.bonusOffer || (roundState.bonusSeed || walletState.bet) * mathConfig.consolationMultiplier;
+      walletState.roundWin += win;
+      walletState.totalWin += win;
+      walletState.credits += win;
+      setToast(`Bonus 收下 +${money(win)} credits。`);
+      playSound("claim");
+      closeBonus();
+    }
+
+    async function gambleBonus() {
+      if (!roundState.bonusPending || state.busy) return;
+      state.busy = true;
+      const step = roundState.bonusStep;
+      const successRate = mathConfig.bonusSuccessRates[Math.min(step, mathConfig.bonusSuccessRates.length - 1)];
+      nextActionMeta();
+      await wait(260);
+      if (Math.random() < successRate) {
+        roundState.bonusStep = Math.min(roundState.bonusStep + 1, mathConfig.bonusMultipliers.length - 1);
+        renderBonus();
+        setToast(`階梯升級！目前 x${mathConfig.bonusMultipliers[roundState.bonusStep]}。`);
+        playSound("clear-10");
+      } else {
+        const win = (roundState.bonusSeed || walletState.bet) * mathConfig.consolationMultiplier;
+        walletState.roundWin += win;
+        walletState.totalWin += win;
+        walletState.credits += win;
+        setToast(`挑戰失敗，保底 +${money(win)} credits。`);
+        playSound("invalid");
+        closeBonus();
+      }
+      state.busy = false;
+      updateUI();
+    }
+
     async function animateClearWave(group, clicked, comboWaves, createWild) {
       const anchor = groupAnchor(group, clicked);
-      const base = scoreFor(group.length);
       state.combo = comboWaves;
       state.clearing = new Set(group.map(keyOf));
-      showScorePopup(anchor, base, comboWaves);
       const tier = showClearBurst(group, anchor);
+      const fragments = awardFragments(tier);
+      if (fragments) showScorePopup(anchor, `+${fragments} Frag`, comboWaves);
       updateUI();
       render();
       const specialMessage = tierMessage(tier, group.length);
       const comboText = comboWaves ? `Combo ${comboWaves}！` : "";
-      setToast(createWild ? "百搭糖果形成！落定後會嘗試連爆。" : specialMessage || `${comboText}消去 ${group.length} 顆糖果！`);
+      setToast(createWild ? "百搭糖果形成！落定後會嘗試連爆。" : fragments ? `${specialMessage || comboText} +${fragments} Jackpot 碎片` : `${comboText}普通消去不派彩。`);
       playSound(tier ? `clear-${tier}` : comboWaves ? "combo" : "clear");
       if (createWild) playSound("wild");
       await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
@@ -953,18 +1256,28 @@
       state.hint = [];
       updateUI();
       render();
-      return { base, anchor };
+      return { fragments, tier, anchor };
     }
 
     async function clearGroup(group, clicked) {
       state.busy = true;
       clearIdleHint();
+      if (walletState.credits < walletState.bet) {
+        setToast("Credits 不足，請降低 Bet。");
+        playSound("invalid");
+        state.busy = false;
+        updateUI();
+        return;
+      }
+
+      nextActionMeta();
+      walletState.credits -= walletState.bet;
+      walletState.roundWin = 0;
+      roundState.chainCount = 0;
+      roundState.baseFragments = 0;
       state.combo = 0;
-      let totalBase = 0;
-      let lastAnchor = clicked;
-      const firstWave = await animateClearWave(group, clicked, 0, group.length >= wildCreateThreshold);
-      totalBase += firstWave.base;
-      lastAnchor = firstWave.anchor;
+
+      await animateClearWave(group, clicked, 0, group.length >= wildCreateThreshold);
 
       let chain = 0;
       let guard = 0;
@@ -984,22 +1297,25 @@
           }
         }
         const anchor = wildTriggers[0].wild;
-        const waveResult = await animateClearWave(wave, anchor, chain, false);
-        totalBase += waveResult.base;
-        lastAnchor = waveResult.anchor;
+        await animateClearWave(wave, anchor, chain, false);
       }
 
-      const totalGain = Math.round(totalBase * actionMultiplier(chain));
-      state.score += totalGain;
       state.combo = chain;
-      showScorePopup(lastAnchor || clicked, totalGain, chain);
+      roundState.chainCount = chain;
       updateUI();
       render();
       if (chain) {
-        setToast(`Combo ${chain}！本次總分 x${actionMultiplier(chain).toFixed(2)}`);
+        setToast(`Combo ${chain}！百搭連爆倍率 x${actionMultiplier(chain).toFixed(2)}，獎項只在 Bonus 結算。`);
         playSound("combo");
         await wait(420);
         state.popups = [];
+      }
+
+      if (maybeOpenBonus()) {
+        state.busy = false;
+        updateUI();
+        render();
+        return;
       }
 
       if (!findClickableGroups().length) {
@@ -1011,16 +1327,15 @@
       render();
       resetIdleHint();
     }
-
     async function handleClick(pos) {
-      if (state.busy) return;
+      if (state.busy || roundState.bonusPending) return;
       startAudio();
       const group = getConnectedGroup(pos);
       if (group.length < minGroup) {
         state.invalid = new Set(group.map(keyOf));
         state.hint = [];
         render();
-        setToast("要 3 顆以上相連才可以消去。");
+        setToast("至少 3 顆相連糖果才可以消去。");
         playSound("invalid");
         await wait(280);
         state.invalid.clear();
@@ -1110,6 +1425,10 @@
         tone(784, 0.22, 0.044, "sine", now);
         tone(1047, 0.28, 0.038, "sine", now + 0.1);
         tone(1568, 0.34, 0.026, "sine", now + 0.24);
+      } else if (kind === "claim") {
+        tone(659, 0.2, 0.04, "sine", now);
+        tone(880, 0.26, 0.036, "sine", now + 0.08);
+        tone(1319, 0.32, 0.026, "sine", now + 0.2);
       } else if (kind === "shuffle") {
         tone(330, 0.32, 0.045, "sine", now);
         tone(247, 0.42, 0.04, "sine", now + 0.12);
@@ -1165,6 +1484,10 @@
 
     document.addEventListener("gesturestart", event => event.preventDefault());
     document.addEventListener("dblclick", event => event.preventDefault(), { passive: false });
+    els.betDown.addEventListener("click", () => changeBet(-mathConfig.betStep));
+    els.betUp.addEventListener("click", () => changeBet(mathConfig.betStep));
+    els.collectBonus.addEventListener("click", collectBonus);
+    els.gambleBonus.addEventListener("click", gambleBonus);
 
     createBoard();
     updateUI();
@@ -1173,3 +1496,5 @@
   </script>
 </body>
 </html>
+
+

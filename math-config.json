@@ -1,0 +1,22 @@
+{
+  "mode": "closed-test-wallet",
+  "currency": "non_cashable_credits",
+  "initialCredits": 1000,
+  "minBet": 10,
+  "maxBet": 100,
+  "betStep": 10,
+  "fragmentTarget": 10,
+  "fragmentAwards": {
+    "6": 1,
+    "10": 2,
+    "20": 5
+  },
+  "bonusMultipliers": [5, 10, 20, 50, 100],
+  "bonusSuccessRates": [0.93, 0.8, 0.65, 0.48, 0.3],
+  "consolationMultiplier": 1,
+  "notes": [
+    "Base clears do not pay directly.",
+    "Credits are for closed testing only and are not cashable.",
+    "Real-money versions must use server-authoritative RNG, audited math, jurisdiction checks, player protection, and compliance review."
+  ]
+}
