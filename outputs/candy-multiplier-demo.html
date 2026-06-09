@@ -208,6 +208,25 @@
       background-image: url("assets/candies/candy-5.png");
     }
 
+    .special-wild {
+      background-image: url("assets/candies/candy-5.png");
+      filter: drop-shadow(0 0 10px rgba(255, 244, 84, 0.95)) drop-shadow(0 7px 8px rgba(89, 31, 93, 0.22));
+      animation: wild-idle 1180ms ease-in-out infinite;
+    }
+
+    .special-wild::before {
+      content: "";
+      display: block;
+      position: absolute;
+      inset: 4%;
+      border-radius: 50%;
+      background: conic-gradient(from 0deg, rgba(255,64,128,0.9), rgba(255,222,60,0.86), rgba(54,216,255,0.82), rgba(139,80,255,0.86), rgba(255,64,128,0.9));
+      opacity: 0.36;
+      filter: blur(1px);
+      animation: wild-spin 1600ms linear infinite;
+      z-index: -1;
+    }
+
     .controls {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -424,6 +443,16 @@
       100% { opacity: 0; transform: translate(calc(var(--dx) * var(--cell)), calc(var(--dy) * var(--cell))) scale(1) rotate(calc(var(--rot) + 260deg)); }
     }
 
+    @keyframes wild-idle {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+    }
+
+    @keyframes wild-spin {
+      0% { transform: rotate(0deg) scale(1.06); }
+      100% { transform: rotate(360deg) scale(1.06); }
+    }
+
     @media (max-height: 760px) {
       :root { --cell: clamp(31px, 10.1vw, 50px); }
       .app { gap: 6px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
@@ -475,13 +504,12 @@
     const candyTypes = 5;
     const refillNeighborBias = 0.25;
     const minGroup = 3;
-    const comboWindow = 2000;
+    const wildCreateThreshold = 10;
 
     const state = {
       board: [],
       score: 0,
       combo: 0,
-      lastClearAt: 0,
       busy: false,
       hint: [],
       clearing: new Set(),
@@ -522,8 +550,8 @@
       return Math.floor(Math.random() * candyTypes);
     }
 
-    function makeCell(type = randomCandy()) {
-      return { type };
+    function makeCell(type = randomCandy(), special = null) {
+      return { type, special };
     }
 
     function biasedRefillCandy(r, c) {
@@ -583,7 +611,7 @@
           if (state.hint.some(pos => pos.r === r && pos.c === c)) button.classList.add("hint");
           if (cell) {
             const candy = document.createElement("div");
-            candy.className = `candy type-${cell.type}`;
+            candy.className = cell.special === "wild" ? "candy special-wild" : `candy type-${cell.type}`;
             button.appendChild(candy);
           }
           els.board.appendChild(button);
@@ -641,7 +669,7 @@
 
     function getConnectedGroup(start) {
       const startCell = state.board[start.r][start.c];
-      if (!startCell) return [];
+      if (!startCell || startCell.special === "wild") return [];
       const target = startCell.type;
       const seen = new Set([keyOf(start)]);
       const queue = [start];
@@ -658,7 +686,7 @@
           if (!inBounds(next.r, next.c)) continue;
           const key = keyOf(next);
           const cell = state.board[next.r][next.c];
-          if (seen.has(key) || !cell || cell.type !== target) continue;
+          if (seen.has(key) || !cell || cell.special === "wild" || cell.type !== target) continue;
           seen.add(key);
           queue.push(next);
         }
@@ -709,14 +737,18 @@
     }
 
     function comboMultiplier() {
-      if (!state.combo) return 1;
-      return 1 + (state.combo * (state.combo + 1) * 0.05);
+      return actionMultiplier(state.combo);
     }
 
     function scoreFor(count) {
       if (count <= 3) return count * 10;
       if (count === 4) return 48;
       return Math.round(count * 12 + Math.pow(count - 4, 2) * 12);
+    }
+
+    function actionMultiplier(comboWaves) {
+      if (!comboWaves) return 1;
+      return 1 + comboWaves * 0.25 + Math.max(0, comboWaves - 1) * 0.15;
     }
 
     function groupAnchor(group, clicked) {
@@ -726,6 +758,40 @@
         r: Math.round(total.r / group.length),
         c: Math.round(total.c / group.length)
       };
+    }
+
+    function findWildTriggers() {
+      const triggers = [];
+      const usedWilds = new Set();
+      for (let r = 0; r < rows; r += 1) {
+        for (let c = 0; c < cols; c += 1) {
+          const wild = state.board[r][c];
+          if (!wild || wild.special !== "wild") continue;
+          const wildKey = keyOf({ r, c });
+          if (usedWilds.has(wildKey)) continue;
+          let best = null;
+          for (const next of [
+            { r: r - 1, c },
+            { r: r + 1, c },
+            { r, c: c - 1 },
+            { r, c: c + 1 }
+          ]) {
+            if (!inBounds(next.r, next.c)) continue;
+            const neighbor = state.board[next.r][next.c];
+            if (!neighbor || neighbor.special === "wild") continue;
+            const colorGroup = getConnectedGroup(next);
+            const group = [{ r, c }, ...colorGroup.filter(pos => pos.r !== r || pos.c !== c)];
+            if (group.length >= minGroup && (!best || group.length > best.cells.length)) {
+              best = { cells: group, clicked: { r, c }, wild: { r, c }, type: neighbor.type };
+            }
+          }
+          if (best) {
+            triggers.push(best);
+            usedWilds.add(wildKey);
+          }
+        }
+      }
+      return triggers;
     }
 
     function collapseBoard() {
@@ -793,7 +859,7 @@
       state.popups.push({
         r: Math.max(0, anchor.r - 0.2),
         c: Math.min(cols - 1, anchor.c + 0.15),
-        text: combo > 0 ? `+${gain}  x${comboMultiplier().toFixed(1)}` : `+${gain}`,
+        text: combo > 0 ? `+${gain}  x${actionMultiplier(combo).toFixed(1)}` : `+${gain}`,
         combo: combo > 0
       });
     }
@@ -847,28 +913,30 @@
       return tier;
     }
 
-    async function clearGroup(group, clicked) {
-      state.busy = true;
-      clearIdleHint();
-      const now = Date.now();
-      state.combo = now - state.lastClearAt <= comboWindow ? state.combo + 1 : 0;
-      state.lastClearAt = now;
-
+    async function animateClearWave(group, clicked, comboWaves, createWild) {
       const anchor = groupAnchor(group, clicked);
       const base = scoreFor(group.length);
-      const gain = Math.round(base * comboMultiplier());
-      state.score += gain;
+      state.combo = comboWaves;
       state.clearing = new Set(group.map(keyOf));
-      showScorePopup(anchor, gain, state.combo);
+      showScorePopup(anchor, base, comboWaves);
       const tier = showClearBurst(group, anchor);
       updateUI();
       render();
       const specialMessage = tierMessage(tier, group.length);
-      setToast(specialMessage || (state.combo ? `Combo ${state.combo}！消去 ${group.length} 顆糖果。` : `消去 ${group.length} 顆糖果！`));
-      playSound(tier ? `clear-${tier}` : state.combo ? "combo" : "clear");
+      const comboText = comboWaves ? `Combo ${comboWaves}！` : "";
+      setToast(createWild ? "百搭糖果形成！落定後會嘗試連爆。" : specialMessage || `${comboText}消去 ${group.length} 顆糖果！`);
+      playSound(tier ? `clear-${tier}` : comboWaves ? "combo" : "clear");
+      if (createWild) playSound("wild");
       await wait(tier >= 20 ? 760 : tier >= 10 ? 560 : tier >= 6 ? 460 : 340);
 
-      for (const pos of group) state.board[pos.r][pos.c] = null;
+      const clickedKey = clicked ? keyOf(clicked) : "";
+      for (const pos of group) {
+        if (createWild && keyOf(pos) === clickedKey) {
+          state.board[pos.r][pos.c] = makeCell(null, "wild");
+        } else {
+          state.board[pos.r][pos.c] = null;
+        }
+      }
       state.clearing.clear();
       state.popups = [];
       state.bursts = [];
@@ -883,6 +951,57 @@
       state.settling.clear();
       state.entering.clear();
       state.hint = [];
+      updateUI();
+      render();
+      return { base, anchor };
+    }
+
+    async function clearGroup(group, clicked) {
+      state.busy = true;
+      clearIdleHint();
+      state.combo = 0;
+      let totalBase = 0;
+      let lastAnchor = clicked;
+      const firstWave = await animateClearWave(group, clicked, 0, group.length >= wildCreateThreshold);
+      totalBase += firstWave.base;
+      lastAnchor = firstWave.anchor;
+
+      let chain = 0;
+      let guard = 0;
+      while (guard < 12) {
+        const wildTriggers = findWildTriggers();
+        if (!wildTriggers.length) break;
+        guard += 1;
+        chain += 1;
+        const clearKeys = new Set();
+        const wave = [];
+        for (const trigger of wildTriggers) {
+          for (const pos of trigger.cells) {
+            const key = keyOf(pos);
+            if (clearKeys.has(key)) continue;
+            clearKeys.add(key);
+            wave.push(pos);
+          }
+        }
+        const anchor = wildTriggers[0].wild;
+        const waveResult = await animateClearWave(wave, anchor, chain, false);
+        totalBase += waveResult.base;
+        lastAnchor = waveResult.anchor;
+      }
+
+      const totalGain = Math.round(totalBase * actionMultiplier(chain));
+      state.score += totalGain;
+      state.combo = chain;
+      showScorePopup(lastAnchor || clicked, totalGain, chain);
+      updateUI();
+      render();
+      if (chain) {
+        setToast(`Combo ${chain}！本次總分 x${actionMultiplier(chain).toFixed(2)}`);
+        playSound("combo");
+        await wait(420);
+        state.popups = [];
+      }
+
       if (!findClickableGroups().length) {
         await reshuffleDeadBoard();
         return;
@@ -987,6 +1106,10 @@
         tone(784, 0.48, 0.046, "sine", now + 0.2);
         tone(1047, 0.52, 0.038, "sine", now + 0.36);
         tone(1568, 0.46, 0.026, "sine", now + 0.56);
+      } else if (kind === "wild") {
+        tone(784, 0.22, 0.044, "sine", now);
+        tone(1047, 0.28, 0.038, "sine", now + 0.1);
+        tone(1568, 0.34, 0.026, "sine", now + 0.24);
       } else if (kind === "shuffle") {
         tone(330, 0.32, 0.045, "sine", now);
         tone(247, 0.42, 0.04, "sine", now + 0.12);
