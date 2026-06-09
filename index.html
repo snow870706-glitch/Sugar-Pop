@@ -8,7 +8,7 @@
     :root {
       --ink: #5a2d61;
       --panel: rgba(255, 255, 255, 0.78);
-      --cell: clamp(32px, 10.6vw, 58px);
+      --cell: clamp(36px, 12.4vw, 62px);
       --app-height: 100svh;
       font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif;
     }
@@ -58,52 +58,30 @@
       margin: 0 auto;
       padding: max(10px, env(safe-area-inset-top)) 12px max(10px, env(safe-area-inset-bottom));
       display: grid;
-      grid-template-rows: minmax(112px, auto) minmax(0, 1fr) 46px;
-      gap: 8px;
+      grid-template-rows: 58px minmax(0, 1fr) 70px;
+      gap: 6px;
       overflow: hidden;
     }
 
     .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      min-height: 104px;
-      overflow: hidden;
-    }
-
-    .brand {
       display: grid;
-      gap: 0;
-      line-height: 1;
-    }
-
-    .brand-title {
-      font-size: clamp(24px, 8vw, 40px);
-      font-weight: 1000;
-      color: #ff337f;
-      text-shadow: 0 3px 0 #fff, 0 6px 14px rgba(117, 24, 87, 0.18);
-      letter-spacing: 0;
-    }
-
-    .brand-sub {
-      margin-top: 2px;
-      font-size: 12px;
-      font-weight: 900;
-      color: rgba(90, 45, 97, 0.72);
+      align-items: center;
+      gap: 6px;
+      min-height: 58px;
+      overflow: hidden;
     }
 
     .stats {
       display: grid;
-      grid-template-columns: repeat(3, minmax(74px, 1fr));
+      grid-template-columns: 0.9fr 1.1fr;
       gap: 6px;
-      align-self: start;
+      align-self: stretch;
     }
 
     .stat {
       min-width: 0;
-      min-height: 49px;
-      padding: 7px 8px;
+      min-height: 52px;
+      padding: 8px 10px;
       border: 2px solid rgba(255, 255, 255, 0.72);
       border-radius: 8px;
       background: var(--panel);
@@ -119,7 +97,7 @@
 
     .value {
       margin-top: 2px;
-      font-size: 19px;
+      font-size: 20px;
       line-height: 1;
       font-weight: 1000;
       color: #7b2c91;
@@ -246,9 +224,10 @@
 
     .controls {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto repeat(3, minmax(64px, 1fr));
       align-items: center;
-      gap: 8px;
+      gap: 6px;
+      min-height: 64px;
     }
 
     .bet-controls {
@@ -271,31 +250,8 @@
       touch-action: manipulation;
     }
 
-    .toast {
-      min-height: 38px;
-      padding: 9px 12px;
-      display: flex;
-      align-items: center;
-      border-radius: 8px;
-      color: rgba(90, 45, 97, 0.86);
-      font-size: 13px;
-      font-weight: 900;
-      background: rgba(255,255,255,0.58);
-      border: 2px solid rgba(255,255,255,0.58);
-      box-shadow: 0 10px 22px rgba(113, 38, 99, 0.1);
-    }
-
-    .hint-btn {
-      height: 38px;
-      padding: 0 16px;
-      border: 0;
-      border-radius: 8px;
-      color: #fff;
-      font-weight: 1000;
-      background: linear-gradient(135deg, #ff4b93, #7d42ff);
-      box-shadow: 0 10px 20px rgba(119, 39, 144, 0.24), inset 0 1px 0 rgba(255,255,255,0.42);
-      cursor: pointer;
-      touch-action: manipulation;
+    .bottom-stat {
+      height: 58px;
     }
 
     .bonus-overlay {
@@ -670,53 +626,32 @@
     }
 
     @media (max-height: 760px) {
-      :root { --cell: clamp(31px, 10.1vw, 50px); }
-      .app { gap: 6px; grid-template-rows: minmax(98px, auto) minmax(0, 1fr) 42px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
-      .topbar { min-height: 92px; }
-      .brand-title { font-size: clamp(22px, 7vw, 34px); }
-      .brand-sub { display: none; }
+      :root { --cell: clamp(34px, 11.7vw, 58px); }
+      .app { gap: 5px; grid-template-rows: 54px minmax(0, 1fr) 66px; padding-top: max(7px, env(safe-area-inset-top)); padding-bottom: max(7px, env(safe-area-inset-bottom)); }
+      .topbar { min-height: 54px; }
       .stat { padding: 7px 9px; }
       .value { font-size: 20px; }
     }
 
     @media (max-width: 390px) {
-      :root { --cell: clamp(30px, 10vw, 48px); }
-      .toast { font-size: 12px; }
-      .hint-btn { padding: 0 12px; }
+      :root { --cell: clamp(33px, 11.6vw, 52px); }
+      .controls { grid-template-columns: auto repeat(3, minmax(56px, 1fr)); }
+      .label { font-size: 10px; }
+      .value { font-size: 18px; }
     }
   </style>
 </head>
 <body>
   <main class="app">
     <header class="topbar">
-      <div class="brand">
-        <div class="brand-title">Sugar Pop</div>
-        <div class="brand-sub">封閉測試錢包 - Jackpot Chase</div>
-      </div>
       <div class="stats">
         <div class="stat">
-          <div class="label">Credits</div>
-          <div class="value" id="credits">1,000</div>
+          <div class="label">Combo</div>
+          <div class="value" id="chain">Chain x1.0</div>
         </div>
         <div class="stat">
-          <div class="label">Bet</div>
-          <div class="value" id="bet">10</div>
-        </div>
-        <div class="stat">
-          <div class="label">Total Win</div>
-          <div class="value" id="totalWin">0</div>
-        </div>
-        <div class="stat">
-          <div class="label">Round Win</div>
-          <div class="value" id="roundWin">0</div>
-        </div>
-        <div class="stat">
-        <div class="label">Jackpot Fragments</div>
+          <div class="label">Jackpot Fragments</div>
           <div class="value" id="fragments">0/10</div>
-        </div>
-        <div class="stat">
-          <div class="label">Chain</div>
-          <div class="value" id="chain">x1.0</div>
         </div>
       </div>
     </header>
@@ -730,8 +665,18 @@
         <button class="bet-btn" id="betDown" type="button" aria-label="decrease bet">-</button>
         <button class="bet-btn" id="betUp" type="button" aria-label="increase bet">+</button>
       </div>
-      <div class="toast" id="toast">普通消去不派彩，收集 Jackpot 碎片進入階梯挑戰。</div>
-      <button class="hint-btn" id="hint" type="button">提示</button>
+      <div class="stat bottom-stat">
+        <div class="label">Total</div>
+        <div class="value" id="totalWin">0</div>
+      </div>
+      <div class="stat bottom-stat">
+        <div class="label">Bet</div>
+        <div class="value" id="bet">10</div>
+      </div>
+      <div class="stat bottom-stat">
+        <div class="label">Credits</div>
+        <div class="value" id="credits">1,000</div>
+      </div>
     </section>
   </main>
 
@@ -813,11 +758,10 @@
       credits: document.querySelector("#credits"),
       bet: document.querySelector("#bet"),
       totalWin: document.querySelector("#totalWin"),
-      roundWin: document.querySelector("#roundWin"),
       fragments: document.querySelector("#fragments"),
       chain: document.querySelector("#chain"),
-      toast: document.querySelector("#toast"),
-      hint: document.querySelector("#hint"),
+      toast: null,
+      hint: null,
       betDown: document.querySelector("#betDown"),
       betUp: document.querySelector("#betUp"),
       bonusOverlay: document.querySelector("#bonusOverlay"),
@@ -911,6 +855,7 @@
     }
 
     function setToast(text) {
+      if (!els.toast) return;
       els.toast.textContent = text;
     }
 
@@ -918,7 +863,6 @@
       els.credits.textContent = money(walletState.credits);
       els.bet.textContent = money(walletState.bet);
       els.totalWin.textContent = money(walletState.totalWin);
-      els.roundWin.textContent = money(walletState.roundWin);
       els.fragments.textContent = `${formatDecimal(Math.min(walletState.fragments, mathConfig.fragmentTarget))}/${formatDecimal(mathConfig.fragmentTarget)}`;
       els.chain.textContent = `Chain x${comboMultiplier().toFixed(1)}`;
       const betLocked = state.busy || roundState.bonusPending || state.fragmentFlights > 0;
@@ -956,6 +900,7 @@
         board: cloneBoard(state.board),
         fragments: oneDecimal(walletState.fragments),
         roundWin: walletState.roundWin,
+        totalWin: walletState.totalWin,
         combo: state.combo,
         chainCount: roundState.chainCount,
         bonusPending: roundState.bonusPending,
@@ -993,6 +938,7 @@
       walletState.bet = bet;
       walletState.fragments = oneDecimal(slot.fragments || 0);
       walletState.roundWin = slot.roundWin || 0;
+      walletState.totalWin = slot.totalWin || 0;
       state.board = cloneBoard(slot.board);
       state.combo = slot.combo || 0;
       state.hint = [];
@@ -1548,8 +1494,8 @@
     function collectBonus() {
       if (!roundState.bonusPending || state.busy) return;
       const win = roundState.bonusOffer || (roundState.bonusSeed || walletState.bet) * mathConfig.consolationMultiplier;
-      walletState.roundWin += win;
-      walletState.totalWin += win;
+      walletState.roundWin = win;
+      walletState.totalWin = win;
       walletState.credits += win;
       setToast(`Bonus 收下 +${money(win)} credits。`);
       playSound("claim");
@@ -1573,8 +1519,8 @@
         playSound("clear-10");
       } else {
         const win = (roundState.bonusSeed || walletState.bet) * mathConfig.consolationMultiplier;
-        walletState.roundWin += win;
-        walletState.totalWin += win;
+        walletState.roundWin = win;
+        walletState.totalWin = win;
         walletState.credits += win;
         setToast(`挑戰失敗，Bonus +${money(win)} credits。`);
         playSound("invalid");
@@ -1647,6 +1593,7 @@
 
       nextActionMeta();
       walletState.credits -= walletState.bet;
+      walletState.totalWin = 0;
       walletState.roundWin = 0;
       roundState.chainCount = 0;
       roundState.baseFragments = 0;
@@ -1737,10 +1684,12 @@
       handleClick({ r: Number(cell.dataset.r), c: Number(cell.dataset.c) });
     });
 
-    els.hint.addEventListener("click", () => {
-      startAudio();
-      showHint();
-    });
+    if (els.hint) {
+      els.hint.addEventListener("click", () => {
+        startAudio();
+        showHint();
+      });
+    }
 
     function startAudio() {
       if (state.audio) {
