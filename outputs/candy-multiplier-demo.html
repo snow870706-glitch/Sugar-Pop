@@ -773,47 +773,50 @@
       }
     }
 
-    function softPad(freqs, startTime, duration = 0.92) {
+    function softPad(freqs, startTime, duration = 1.65) {
       for (const freq of freqs) {
-        tone(freq, duration, 0.006, "sine", startTime);
+        tone(freq, duration, 0.007, "sine", startTime);
+        tone(freq * 2, duration * 0.72, 0.003, "sine", startTime + 0.08);
       }
     }
 
     function startMusic() {
       if (state.musicTimer || !state.audio) return;
       const chords = [
-        [523, 659, 784],
-        [392, 587, 784],
-        [440, 523, 659],
-        [349, 523, 698]
+        [392, 523, 659],
+        [440, 554, 659],
+        [349, 440, 587],
+        [392, 494, 659]
       ];
-      const bounce = [262, 196, 220, 175];
+      const bass = [196, 220, 175, 196];
       const melody = [
-        1047, 1175, 1319, 1568, 1319, 1175, 1047, 0,
-        1568, 1760, 1568, 1319, 1175, 1319, 1047, 0,
-        1175, 1319, 1568, 1760, 1568, 1319, 1175, 1047,
-        1319, 1568, 1760, 2093, 1760, 1568, 1319, 0
+        [784, 880, 988, 880],
+        [659, 784, 880, 0],
+        [698, 784, 988, 880],
+        [784, 659, 698, 0],
+        [880, 988, 1175, 988],
+        [784, 880, 988, 0],
+        [698, 784, 880, 784],
+        [659, 698, 784, 0]
       ];
-      const sparkle = [2093, 2349, 2637, 3136];
+      const sparkle = [1319, 1568, 1760, 1976];
       let bar = 0;
       const playBar = () => {
         if (!state.audio || state.audio.state === "suspended") return;
         const now = state.audio.currentTime + 0.04;
         const index = bar % chords.length;
-        softPad(chords[index], now, 0.86);
-        tone(bounce[index], 0.18, 0.009, "sine", now + 0.02);
-        tone(bounce[index] * 2, 0.12, 0.008, "triangle", now + 0.26);
-        tone(bounce[index] * 2, 0.12, 0.008, "triangle", now + 0.5);
-        tone(bounce[index] * 3, 0.14, 0.007, "triangle", now + 0.74);
-        for (let i = 0; i < 8; i += 1) {
-          const note = melody[(bar * 8 + i) % melody.length];
-          if (note) tone(note, 0.115, 0.015, "triangle", now + 0.06 + i * 0.115);
-          if (i === 3 || i === 7) tone(sparkle[(bar + i) % sparkle.length], 0.105, 0.006, "sine", now + 0.07 + i * 0.115);
+        softPad(chords[index], now, 1.68);
+        tone(bass[index], 0.56, 0.007, "sine", now + 0.04);
+        const phrase = melody[bar % melody.length];
+        for (let i = 0; i < phrase.length; i += 1) {
+          const note = phrase[i];
+          if (note) tone(note, 0.42, 0.012, "sine", now + 0.16 + i * 0.38);
         }
+        if (bar % 2 === 1) tone(sparkle[bar % sparkle.length], 0.28, 0.0045, "sine", now + 1.38);
         bar += 1;
       };
       playBar();
-      state.musicTimer = setInterval(playBar, 960);
+      state.musicTimer = setInterval(playBar, 1760);
     }
 
     document.addEventListener("gesturestart", event => event.preventDefault());
